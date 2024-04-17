@@ -1,82 +1,39 @@
-const { DeviceConfigurator, scanModbus } = require('./modbus_connect');
+//Import Devices from mongo
+const Device = require('./models/Device')
 
-const connections = [
-    {
-        device: new DeviceConfigurator("Simulador 2", "127.0.0.1", 503, 1, 10000, 1),
-        writes: [
-            // {
-            //     functionCode: 6,
-            //     address: 1,
-            //     value: 20.2,
-            //     dataType: "float32",
-            // },
-            // {
-            //     functionCode: 5,
-            //     address: 1,
-            //     value: 1,
-            //     dataType: "bool",
-            // },
-        ],
-        reads: [
-            {
-                functionCode: 3,
-                address: 1,
-                elements: 2,
-                dataType: "float32",
-                variablesName: ["float1"]
-            },
-            {
-                functionCode: 1,
-                address: 1,
-                elements: 1,
-                dataType: "bool",
-                variablesName: ["bool1"]
-            }, 
-        ],
-    },
-    {
-        device: new DeviceConfigurator("Simulador", "127.0.0.1", 502, 1, 10000, 1),
-        writes: [
-            // {
-            //     functionCode: 6,
-            //     address: 1,
-            //     value: 100,
-            //     dataType: "uint16",
-            // },
-            // {
-            //     functionCode: 6,
-            //     address: 2,
-            //     value: 200,
-            //     dataType: "uint16",
-            // },
-            // {
-            //     functionCode: 6,
-            //     address: 3,
-            //     value: 300,
-            //     dataType: "uint16",
-            // },
-            // {
-            //     functionCode: 6,
-            //     address: 4,
-            //     value: 400,
-            //     dataType: "uint16",
-            // },
-        ],
-        reads: [
-            {
-                functionCode: 3,
-                address: 1,
-                elements: 4,
-                dataType: "uint16",
-                variablesName: ["variable1", "variable2", "variable3", "variable4"]
-            },
-        ],
-    },
-];
+//Import Express
+const express = require("express")
 
-async function main () {
-   const modbusVariables =  await scanModbus(connections, 1000)
-    console.log(modbusVariables)
-}
+//Cors
+const cors = require('cors')
 
-main()
+//Inicializa expresss
+const app = express();
+
+//Configura express
+app.use(express.json());
+
+//Cors
+app.use(cors({
+    origin:'*',
+    methods: ["GET", 'PATCH', 'POST', 'DELETE'],
+}))
+
+//Public folders
+app.use(express.static('public'));
+
+//Rota de Devices
+const DeviceRoutes = require('./routes/DeviceRoutes')
+app.use('/device', DeviceRoutes)
+
+//Rota de Tasks
+const TaskRoutes = require('./routes/TaskRoutes')
+app.use('/task', TaskRoutes)
+
+// //Rota de dados modbus
+// const ModbusDataRoutes = require('./routes/ModbusDataRoutes')
+// app.use('/modbusdata', ModbusDataRoutes)
+
+//Porta API
+app.listen(3000);
+

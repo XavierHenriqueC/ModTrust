@@ -70,7 +70,7 @@ class DeviceConfigurator {
                       //  console.log(`Connected to ${this.name} at ${this.options.host}:${this.options.port}`);
                     });
                     clearTimeout(timer)
-                },0)
+                },10)
                
             } catch (err) {
                 console.error(err);
@@ -89,7 +89,7 @@ class DeviceConfigurator {
                 this.socket.end()
                 resolve(true)
                 clearTimeout(timer)
-            },0)
+            },10)
         })
     }
 
@@ -290,7 +290,7 @@ class DeviceConfigurator {
 }
 
 //Função para montar as conexões modbus e suas devidas tarefas de read e write
-async function executeModbus(connections) {
+async function scanModbus(connections) {
 
     const modbusVariables = {};
     
@@ -302,7 +302,9 @@ async function executeModbus(connections) {
 
             for (const write of writes) {
                 try {
-                    await Device.writeModbus(write.functionCode, write.address, write.value, write.dataType);
+                    if(write) {
+                        await Device.writeModbus(write.functionCode, write.address, write.value, write.dataType);
+                    }
                 } catch (error) {
                     console.error(`Write Error - device:${connection.device.name}, fc:${write.functionCode}, address:${write.address}, value:${write.value}, dataType:${write.dataType}, error:${error.message}`);
                 }
@@ -310,22 +312,22 @@ async function executeModbus(connections) {
 
             for (const read of reads) {
                 try {
-                    const values = await Device.readModbus(read.functionCode, read.address, read.elements, read.dataType);
+                    if (read) {
+                        const values = await Device.readModbus(read.functionCode, read.address, read.elements, read.dataType);
 
-                   // console.log(values) debug
-
-                    values.forEach((value, index) => {
-                        const variableName = read.variablesName[index];
-                        modbusVariables[variableName] = value;
-                       
-                    });
+                        // console.log(values) debug
+                        values.forEach((value, index) => {
+                            const variableName = read.variablesName[index];
+                            modbusVariables[variableName] = value;
+                        
+                        });
+                    }
+                    
                 } catch (error) {
                     console.error(`Read Error - device:${connection.device.name}, fc:${read.functionCode}, address:${read.address}, elements:${read.elements}, dataType:${read.dataType}, error:${error.message}`);
                 }
             }
         }
-
-        console.log(modbusVariables);
 
     } catch (err) {
         console.error(`executeModbus Error - ${err.message}`);
@@ -334,24 +336,6 @@ async function executeModbus(connections) {
     return modbusVariables
 }
 
-//Função para scanear os dados a cada x segundos
-async function scanModbus (connections, scanRate) {
-    let variables = {}
 
-    if (scanRate < 1000) {
-        console.log("Scan Rate deve ser maior que 1000")
-        return
-    }
-
-    // Executa a função executeModbus uma vez imediatamente
-    variables = executeModbus(connections).catch(error => console.error(`Unhandled promise rejection: ${error.message}`));
-
-    // Configura o intervalo para execução periódica da função executeModbus
-    setInterval(() => {
-       variables = executeModbus(connections).catch(error => console.error(`Unhandled promise rejection: ${error.message}`));
-    }, scanRate); // Intervalo de 10 segundos entre as execuções
-
-    return variables
-}
 
 module.exports = { DeviceConfigurator, scanModbus };
