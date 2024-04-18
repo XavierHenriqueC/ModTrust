@@ -2,6 +2,9 @@
 const Modbus = require('jsmodbus');
 const net = require('net');
 
+//Importa model mongo
+const Device = require('./models/Device')
+
 const {
     isFloat,
     isEven,
@@ -336,6 +339,44 @@ async function scanModbus(connections) {
     return modbusVariables
 }
 
+//Busca conexões e tasks do DB e monta as conexões para entrar no bloco de scanModbus
+const getConnectionsFromDb = async () => {
+    
+    let connections = []
+    try {
+        const devices = await Device.find()
+
+        //Monta Conexões apartir dos dados do mongo
+        connections = devices.map((item) => {
+            const task = item.task
+
+            const reads = task.map((read) => {
+                if(read.functionType === 'read') {
+                    return read
+                }
+            })
+
+            const writes = task.map((write) => {
+                if(write.functionType === 'write') {
+                    return write
+                }
+            })
+
+            const obj = {
+                device: new DeviceConfigurator (item.name, item.ip, item.port, item.unitId, item.timeout, item.baseAddress),
+                writes: writes,
+                reads: reads
+            }
+
+            return obj
+        })
+
+    } catch (err) {
+        throw err
+    }
+
+    return connections
+}
 
 
-module.exports = { DeviceConfigurator, scanModbus };
+module.exports = { DeviceConfigurator, scanModbus, getConnectionsFromDb };

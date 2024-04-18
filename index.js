@@ -1,5 +1,5 @@
-//Import Devices from mongo
-const Device = require('./models/Device')
+//Import Modbus
+const { scanModbus, getConnectionsFromDb } = require('./modbus_connect');
 
 //Import Express
 const express = require("express")
@@ -37,3 +37,16 @@ app.use('/task', TaskRoutes)
 //Porta API
 app.listen(3000);
 
+
+
+//Modbus
+async function main () {
+
+    setInterval(async() => {
+        connections = await getConnectionsFromDb()
+        const modbusVariables = await scanModbus (connections)
+        console.log(modbusVariables)
+    },5000)
+}
+
+main()

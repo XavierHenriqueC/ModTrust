@@ -1,7 +1,7 @@
-const moongose = require('../db/conn');
-const { Schema } = moongose;
+const mongoose = require('../db/conn');
+const { Schema } = mongoose;
 
-const Device = moongose.model(
+const Device = mongoose.model(
     'Device',
     new Schema(
         {

@@ -2,14 +2,8 @@
 const Task = require('../models/Task')
 const Device = require('../models/Device')
 
-//Import Modbus
-const { DeviceConfigurator, scanModbus } = require('../modbus_connect');
-
 //Helpers
 const {isValidId} = require("../helpers/validate-id")
-
-
-let connections = []
 
 module.exports = class TaskController {
     
@@ -87,6 +81,32 @@ module.exports = class TaskController {
                 return
             }
 
+            //Verifica se os nomes de variaveis são validos
+            function validarString(str) {
+                // Expressão regular para verificar se a string começa com uma letra e contém apenas letras, números e underscores
+                var regex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+                // Teste se a string corresponde à expressão regular
+                return regex.test(str);
+            }
+
+            function validaNames(array) {
+                for (let i = 0; i < array.length; i++) {
+                    const test = validarString(array[i]);
+                    if (!test) {
+                        return { status: false, varName: array[i] };
+                    }
+                }
+                return { status: true, varName: "" };
+            }
+
+            const validaNamesExe = validaNames(variablesName);
+
+            if (!validaNamesExe.status) {
+                res.status(422).json({ message: `O nome ${validaNamesExe.varName} é inválido. Exemplo de nome válido: temperature_2Tank` });
+                return;
+            }
+
+            //Verifica se existe nomes repetidos dentro do array de variablesName
             function verificaRepetidos(array) {
                 // Cria um objeto para armazenar a contagem de cada elemento
                 let contador = {};
@@ -162,8 +182,6 @@ module.exports = class TaskController {
                 { new: true},
             )
 
-            connections = await refreshConnections()
-
             res.status(201).json({message: `Task criada com sucesso!`, newTask})
 
         } catch (error) {
@@ -171,59 +189,287 @@ module.exports = class TaskController {
         }
 
     }
-    
-}
 
-//Atualiza tasks modbus
-const refreshConnections = async () => {
-    
-    let connections = []
-    try {
-        const devices = await Device.find()
+    static async getTaskById (req, res) {
+        
+        const id = req.body.id
 
-        //Monta Conexões apartir dos dados do mongo
-        connections = devices.map((item) => {
-            const task = item.task
+        //Validações
+        if(!id) {
+            res.status(422).json({message: "O ID é obrigatório"})
+            return;
+        }
 
-            const reads = task.map((read) => {
-                if(read.functionType === 'read') {
-                    return read
-                }
-            })
+        //Verifica se é um ID valido
+        try {
+            isValidId(id);
+        } catch (error) {
+            return res.status(422).json({ message: error.message });
+        }
 
-            const writes = task.map((write) => {
-                if(write.functionType === 'write') {
-                    return write
-                }
-            })
+        //Puxa Task pelo id no DB
+        const task = await Task.findById(id)
 
-            const obj = {
-                device: new DeviceConfigurator (item.name, item.ip, item.port, item.unitId, item.timeout, item.baseAddress),
-                writes: writes,
-                reads: reads
-            }
+        if(!task) {
+            res.status(422).json({message: "Task não encontrada"})
+            return;
+        }
 
-            return obj
-        })
+        res.status(200).json({task})
 
-    } catch (err) {
-        throw err
     }
 
-    return connections
+    static async editTaskById (req, res) {
+
+        const { id, functionType, functionCode, address, elements, dataType, variablesName } = req.body
+        
+        //Verifica se é um ID valido
+        try {
+            isValidId(id);
+        } catch (error) {
+            return res.status(422).json({ message: error.message });
+        }
+
+        //Puxa task no db
+        const task = await Task.findById(id)
+
+        if(!task) {
+            res.status(422).json({message: "Task não existe"})
+            return
+        }
+
+        if(!functionType) {
+            res.status(422).json({message: "O functionType é obrigatório"})
+            return;
+        }
+
+        task.functionType = functionType
+
+        if(!functionCode) {
+            res.status(422).json({message: "O functionCode é obrigatório"})
+            return;
+        }
+
+        task.functionCode = functionCode
+
+        if(!address) {
+            res.status(422).json({message: "O address é obrigatório"})
+            return;
+        }
+
+        task.address = address
+
+        if(!elements) {
+            res.status(422).json({message: "O elements é obrigatório"})
+            return;
+        }
+
+        task.elements = elements
+
+        if(!dataType) {
+            res.status(422).json({message: "O dataType é obrigatório"})
+            return;
+        }
+
+        task.dataType = dataType
+
+        if(!variablesName) {
+            res.status(422).json({message: "O variablesName é obrigatório"})
+            return;
+        }
+
+        let variablesNameLength = elements
+
+        //Valida VariablesName 
+            if(dataType === "int32" || dataType === "uint32" || dataType === "float32") {
+                variablesNameLength = elements / 2
+            } else {
+                variablesNameLength = elements
+            }
+
+            if(!(Array.isArray(variablesName))) {
+                res.status(422).json({message: "VariablesName deve ser um array"})
+                return
+            }
+
+            if(!(variablesName.length === variablesNameLength)) {
+                res.status(422).json({message: "Todas as variaveis deve possuir um nome"})
+                return
+            }
+
+            //Verifica se os nomes de variaveis são validos
+            function validarString(str) {
+                // Expressão regular para verificar se a string começa com uma letra e contém apenas letras, números e underscores
+                var regex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+                // Teste se a string corresponde à expressão regular
+                return regex.test(str);
+            }
+
+            function validaNames(array) {
+                for (let i = 0; i < array.length; i++) {
+                    const test = validarString(array[i]);
+                    if (!test) {
+                        return { status: false, varName: array[i] };
+                    }
+                }
+                return { status: true, varName: "" };
+            }
+
+            const validaNamesExe = validaNames(variablesName);
+
+            if (!validaNamesExe.status) {
+                res.status(422).json({ message: `O nome ${validaNamesExe.varName} é inválido. Exemplo de nome válido: temperature_2Tank` });
+                return;
+            }
+
+            //Verifica se existe nomes repetidos dentro do array de variablesName
+            function verificaRepetidos(array) {
+                // Cria um objeto para armazenar a contagem de cada elemento
+                let contador = {};
+            
+                // Itera sobre o array
+                for (let i = 0; i < array.length; i++) {
+                    // Se o elemento já existe no objeto contador, retorna true
+                    if (contador[array[i]]) {
+                        return true;
+                    } else {
+                        // Caso contrário, incrementa o contador para esse elemento
+                        contador[array[i]] = 1;
+                    }
+                }
+                // Se nenhum elemento foi repetido, retorna false
+                return false;
+            }
+
+            if(verificaRepetidos(variablesName)) {
+                res.status(422).json({message: "Esse nome de variavel já existe, insira um novo nome"})
+                return
+            }
+
+            task.variablesName = variablesName
+        
+        //
+
+        try {
+           
+            //Atualiza Device
+            await Task.findOneAndUpdate(
+                {_id: task._id},
+                { $set: task},
+                { new: true},
+            )
+
+            res.status(200).json({message: "Task atualizada com sucesso!"})
+
+        } catch (error) {
+            console.log(error)
+            const Error = `${error}`
+            res.status(500).json({message: Error})
+        }
+
+        
+    }
+
+    static async getTasks (req, res) {    
+
+        try {
+            const tasks = await Task.find().sort('-createdAt')
+            res.status(200).json({tasks})
+
+        } catch (err) {
+            res.status(500).json({message: err })
+        }
+    }
+
+    static async deleteTaskById (req, res) {
+
+        const id = req.body.id
+
+        //Validações
+        if(!id) {
+            res.status(422).json({message: "O ID é obrigatório"})
+            return;
+        }
+
+       //Verifica se é um ID valido
+        try {
+            isValidId(id);
+        } catch (error) {
+            return res.status(422).json({ message: error.message });
+        }
+
+        const task = await Task.findById(id)
+        
+        if(!task) {
+            res.status(422).json({message: "Task não encontrada"})
+            return;
+        }
+
+        try {
+            
+            //Deleta task do device
+            await deleteTaskInDevice(task.deviceId, id)
+
+            //Deleta cliente
+            await Task.findByIdAndDelete(id)
+
+            res.status(200).json({message: "Task deletada com sucesso"})
+
+        } catch (err) {
+            res.status(500).json({message: err })
+        }
+
+    }
+    
 }
 
-//Modbus
-async function main () {
+//Funções auxiliares
 
-    const timer = setInterval(async() => {
-        connections = await refreshConnections()
-        const modbusVariables = await scanModbus (connections)
-        console.log(modbusVariables)
-    },5000)
+//Deleta task do device
+async function deleteTaskInDevice(deviceId, taskId) {
+    try {
+        const device = await Device.findById(deviceId)
 
-    
-    
+        // Array original
+        const tasks = device.task;
+        
+        // Filtrando o array para excluir o objeto com _id igual a taskId
+        const newTasks = tasks.map((item) => {
+            const id = `${item._id}`
+           
+            if(id !== taskId) {
+                return item
+            } else {
+                return {}
+            }
+        })
+
+        //Remove objetos vazios
+        function removerObjetosVazios(array) {
+
+            function isObjectVazio(obj) {
+                return Object.keys(obj).length === 0 && obj.constructor === Object;
+            }
+
+            return array.filter(function(elemento) {
+                // Remove apenas objetos vazios {}
+                return !isObjectVazio(elemento);
+            });
+        }
+        
+        const newTasksModified = removerObjetosVazios(newTasks)
+
+        device.task = newTasksModified
+
+        //AdcionaTask ao Device
+        await Device.findOneAndUpdate(
+            {_id: device._id},
+            { $set: device},
+            { new: true},
+        )
+        
+    } catch (err) {
+        console.error(`Erro ao tentar deletar o Task no Device: ${err}`);
+        throw err; // Re-throw the error for handling outside the function
+    }
 }
- 
-main()
