@@ -359,6 +359,8 @@ module.exports = class TaskController {
                 { new: true},
             )
 
+            await updateTaskInDevice(task.deviceId, id)
+
             res.status(200).json({message: "Task atualizada com sucesso!"})
 
         } catch (error) {
@@ -424,6 +426,43 @@ module.exports = class TaskController {
 }
 
 //Funções auxiliares
+
+//Atualiza task do device
+async function updateTaskInDevice(deviceId, taskId) {
+    try {
+        const device = await Device.findById(deviceId)
+
+        const task = await Task.findById(taskId)
+        
+        // Array original
+        const tasks = device.task;
+        
+        // Filtrando o array para atualizar o objeto com _id igual a taskId
+        const newTasks = tasks.map((item) => {
+            const id = `${item._id}`
+            const taskId = `${task._id}`
+           
+            if(id === taskId) {
+                return task
+            } else {
+                return item
+            }
+        })
+
+        device.task = newTasks
+        
+        //AdcionaTask ao Device
+        await Device.findOneAndUpdate(
+            {_id: device._id},
+            { $set: device},
+            { new: true},
+        )
+        
+    } catch (err) {
+        console.error(`Erro ao tentar atualizar as Tasks do Device: ${err}`);
+        throw err; // Re-throw the error for handling outside the function
+    }
+}
 
 //Deleta task do device
 async function deleteTaskInDevice(deviceId, taskId) {

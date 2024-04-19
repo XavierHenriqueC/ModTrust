@@ -1,5 +1,11 @@
+//Import Network Config
+const { configurarRedeUsuario, setDefault } = require('./networkConfig')
+
 //Import Modbus
-const { scanModbus, getConnectionsFromDb } = require('./modbus_connect');
+const { modbusMqtt } = require('./modbus_mqtt');
+
+//Import Network
+const Network = require('./models/Network');
 
 //Import Express
 const express = require("express")
@@ -30,23 +36,29 @@ app.use('/device', DeviceRoutes)
 const TaskRoutes = require('./routes/TaskRoutes')
 app.use('/task', TaskRoutes)
 
-// //Rota de dados modbus
-// const ModbusDataRoutes = require('./routes/ModbusDataRoutes')
-// app.use('/modbusdata', ModbusDataRoutes)
+//Rota de dados modbus
+const ModbusDataRoutes = require('./routes/ModbusDataRoutes');
+app.use('/modbusdata', ModbusDataRoutes)
 
 //Porta API
 app.listen(3000);
 
-
-
-//Modbus
 async function main () {
+    //Seta valores padrão de Network no DB (se necessário)
+    await setDefault ()
+    
+    //Puxa valores de network no DB
+    const networks = await Network.find()
+    const network = networks[0]
 
-    setInterval(async() => {
-        connections = await getConnectionsFromDb()
-        const modbusVariables = await scanModbus (connections)
-        console.log(modbusVariables)
-    },5000)
+    //Configura parametros da placa de rede no sistema do Host
+    configurarRedeUsuario(network.mode, network.ip, network.netmask, network.gateway);
+
+    //Executa Modbus e MQTT
+    modbusMqtt ()
 }
 
 main()
+
+
+
