@@ -4,8 +4,8 @@ import './App.css'
 function App() {
  
   return (
-    <div>
-
+    <div className='App'>
+      <h1 style={{color: "red"}}>TrustBus Gateway</h1>
     </div>
   )
 }
