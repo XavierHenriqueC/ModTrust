@@ -1,9 +1,11 @@
 //Importa Models
 const Task = require('../models/Task')
 const Device = require('../models/Device')
+const SelectedToMqtt = require('../models/SelectedToMqtt')
 
 //Helpers
 const {isValidId} = require("../helpers/validate-id")
+
 
 module.exports = class TaskController {
     
@@ -361,6 +363,8 @@ module.exports = class TaskController {
 
             await updateTaskInDevice(task.deviceId, id)
 
+            await updateVarsToMqtt()
+
             res.status(200).json({message: "Task atualizada com sucesso!"})
 
         } catch (error) {
@@ -414,6 +418,8 @@ module.exports = class TaskController {
 
             //Deleta cliente
             await Task.findByIdAndDelete(id)
+
+            await updateVarsToMqtt()
 
             res.status(200).json({message: "Task deletada com sucesso"})
 
@@ -510,5 +516,33 @@ async function deleteTaskInDevice(deviceId, taskId) {
     } catch (err) {
         console.error(`Erro ao tentar deletar o Task no Device: ${err}`);
         throw err; // Re-throw the error for handling outside the function
+    }
+}
+
+
+//Verifica modificações na task e limpa VarsToMqtt se necessário
+
+async function updateVarsToMqtt() {
+    const tasks = await Task.find()
+
+    let variables = []
+    
+    tasks.forEach((item) => {
+        item.variablesName.forEach((variable) => {
+            variables.push(variable)
+        })
+    })
+
+    if(variables.length > 0) {
+        
+        const varsToMqtt = await SelectedToMqtt.find()
+        console.log(varsToMqtt)
+        console.log(variables)
+        varsToMqtt.forEach(async (item) => {
+            if(!variables.includes(item.name)){
+                await SelectedToMqtt.findOneAndDelete({name: item.name})
+            }
+        })
+    
     }
 }

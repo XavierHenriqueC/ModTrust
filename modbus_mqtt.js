@@ -7,6 +7,8 @@ const mqtt = require('mqtt');
 //Import dados da Network
 const Network = require('./models/Network')
 
+const SelectedToMqtt = require('./models/SelectedToMqtt')
+
 //Configurações MQTT
 let mqttConfig = {
     broker: "",
@@ -55,24 +57,40 @@ connectBrokerMqtt()
 //Publica mensagem MQTT
 const publishData = async (network,variables) => {
 
+    const varsToMqtt = await SelectedToMqtt.find()
+
+    let variablesToMqtt = varsToMqtt.map((item) => {
+        return item.name;
+    });
+    
     function convertObjToArray(obj) {
-        return Object.entries(obj).map(([key, value]) => ({ variable: key, value: value }));
+        return Object.entries(obj)
+            .filter(([key, value]) => variablesToMqtt.includes(key)) // Filtrando apenas as chaves que pertencem ao array de variáveis
+            .map(([key, value]) => ({
+                variable: key,
+                value: value
+            }));
     }
 
     const message = convertObjToArray(variables)
-      
-    // Convertendo a mensagem JSON para uma string
-    const messageString = JSON.stringify(message);
 
-    // Processa mensagem MQTT
-    mqttClient.publish(network.mqttTopic, messageString, function (err) {
+    if(message.length > 0) {
+        // Convertendo a mensagem JSON para uma string
+        const messageString = JSON.stringify(message);
 
-        if(err) {
-            console.log("Erro ao publicar mensagem: ", err)
-        } else {
-            console.log('Mensagem publicada com sucesso no tópico:', network.mqttTopic, messageString);
-        }
-    });
+    
+
+        // Processa mensagem MQTT
+        mqttClient.publish(network.mqttTopic, messageString, function (err) {
+
+            if(err) {
+                console.log("Erro ao publicar mensagem: ", err)
+            } else {
+                console.log('Mensagem publicada com sucesso no tópico:', network.mqttTopic, messageString);
+            }
+        });
+    }
+    
 }
 
 
