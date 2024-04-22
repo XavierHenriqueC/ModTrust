@@ -2,13 +2,17 @@
 const Network = require('../models/Network')
 
 //Helpers
-const {isValidId} = require("../helpers/validate-id")
+const {isValidId, validarEnderecoIP} = require("../helpers/validate-id")
+
+const { configurarRedeUsuario } = require('../networkConfig')
+
+const { connectBrokerMqtt } = require('../modbus_mqtt')
 
 module.exports = class NetworkController {
     
     static async editDeviceById (req, res) {
 
-        const { id } = req.body
+        const { id, mode, ip, netmask, gateway, modbusScanRate, mqttHost, mqttPort, mqttUsername, mqttPassword, mqttTopic, mqttSubscribe, defaultConfigs } = req.body
         
         if(!id) {
             res.status(422).json({message: "O id é obrigatório"})
@@ -22,80 +26,127 @@ module.exports = class NetworkController {
             return res.status(422).json({ message: error.message });
         }
 
-        //Puxa Device pelo ID no DB
-        const device = await Device.findById(id)
+        //Puxa Network pelo ID no DB
+        const network = await Network.findById(id)
 
-        if(!device) {
-            res.status(422).json({message: "Device não encontrado"})
+        if(!network) {
+            res.status(422).json({message: "Network não encontrada"})
             return;
         }
 
         //Validações
-        if(!name) {
-            res.status(422).json({message: "O nome é obrigatório"})
+        if(!mode) {
+            res.status(422).json({message: "O mode é obrigatório"})
             return;
         }
 
-        //Checa se o nome já existe no banco
-        const nameExists = await Device.findOne({name: name})
-
-        if(device.name !== name && nameExists) {
-            res.status(422).json({message: "Esse nome de Device já existe"})
-            return;
-        }
-
-        device.name = name;
+        network.mode = mode
 
         if(!ip) {
             res.status(422).json({message: "O ip é obrigatório"})
             return;
         }
 
-        device.ip = ip
-
-        if(!port) {
-            res.status(422).json({message: "A port é obrigatório"})
+        if(!validarEnderecoIP(ip)) {
+            res.status(422).json({message: "Endereço de IP é invalido"})
             return;
         }
 
-        device.port = port
+        network.ip = ip
 
-        if(!unitId) {
-            res.status(422).json({message: "O unitId é obrigatório"})
+        if(!netmask) {
+            res.status(422).json({message: "O netmask é obrigatório"})
             return;
         }
 
-        device.unitId = unitId
-
-        if(!timeout) {
-            res.status(422).json({message: "O timeout é obrigatório"})
+        if(!validarEnderecoIP(netmask)) {
+            res.status(422).json({message: "Endereço de netmask é invalido"})
             return;
         }
 
-        device.timeout = timeout
+        network.netmask = netmask
 
-        if(!baseAddress) {
-            res.status(422).json({message: "O baseAddress é obrigatório"})
+        if(!gateway) {
+            res.status(422).json({message: "O gateway é obrigatório"})
             return;
         }
 
-        device.baseAddress = baseAddress
+        if(gateway && (!validarEnderecoIP(gateway))) {
+            res.status(422).json({message: "Endereço de gateway é invalido"})
+            return;
+        }
+
+        if (gateway) {
+            network.gateway = gateway
+        }
+
+        if(!modbusScanRate) {
+            res.status(422).json({message: "O modbusScanRate é obrigatório"})
+            return;
+        }
+
+        network.modbusScanRate = modbusScanRate
+
+        if(!mqttHost) {
+            res.status(422).json({message: "O mqttHost é obrigatório"})
+            return;
+        }
+
+        network.mqttHost = mqttHost
+
+        if(!mqttPort) {
+            res.status(422).json({message: "O mqttPort é obrigatório"})
+            return;
+        }
+
+        network.mqttPort = mqttPort
+        
+        if(mqttUsername) {
+            network.mqttUsername = mqttUsername
+        }
+        
+        if(mqttPassword) {
+            network.mqttPassword = mqttPassword
+        }
+
+        if(!mqttTopic) {
+            res.status(422).json({message: "O mqttTopic é obrigatório"})
+            return;
+        }
+
+        network.mqttTopic = mqttTopic
+
+        if(mqttSubscribe) {
+            network.mqttSubscribe = mqttSubscribe
+        }
+       
+        if(!defaultConfigs) {
+            res.status(422).json({message: "O defaultConfigs é obrigatório"})
+            return;
+        }
+
+        network.defaultConfigs = defaultConfigs
 
         try {
             
             //Atualiza Device
-            await Device.findOneAndUpdate(
-                {_id: device._id},
-                { $set: device},
+            await Network.findOneAndUpdate(
+                {_id: network._id},
+                { $set: network},
                 { new: true},
             )
 
-            res.status(200).json({message: "Device atualizado com sucesso!"})
+            res.status(200).json({message: "Network atualizada com sucesso!"})
+
+            await reconfigRede()
+
+            connectBrokerMqtt()
 
         } catch (error) {
             console.log(error)
             res.status(500).json({message: error})
-        }
+        } 
+            
     }
 
     static async getNetwork (req, res) {    
@@ -109,4 +160,19 @@ module.exports = class NetworkController {
         }
     }
 
+}
+
+
+async function reconfigRede () {
+    try {
+        //Puxa valores de network no DB
+        const networks = await Network.find()
+        const network = networks[0]
+
+        //Configura parametros da placa de rede no sistema do Host
+        configurarRedeUsuario(network.mode, network.ip, network.netmask, network.gateway);
+
+    } catch (err) {
+        console.log(err)
+    }
 }

@@ -119,14 +119,14 @@ async function setDefault () {
         network.ip = '192.168.2.10'
         network.netmask = '255.255.255.0'
         network.gateway = '192.168.2.1'
+        network.mac = mac
         network.modbusScanRate = 10000
-        network.mqttHost = 'mqtt=//34.125.20.251'
+        network.mqttHost = 'mqtt://34.125.20.251'
         network.mqttPort = 1883
         network.mqttUsername = ''
         network.mqttPassword = ''
         network.mqttTopic = `trustbus/${mac}`
         network.mqttSubscribe = `trustbus/${mac}`
-        network.mqttScanRate = 10000
         network.defaultConfigs = true
         
         //Volta para valores de fabrica
@@ -146,6 +146,7 @@ async function setDefault () {
         ip : '192.168.2.10',
         netmask : '255.255.255.0',
         gateway : '192.168.2.1',
+        mac : mac,
         modbusScanRate : 10000,
         mqttHost : 'mqtt://34.125.20.251',
         mqttPort : 1883,
@@ -153,7 +154,6 @@ async function setDefault () {
         mqttPassword : '',
         mqttTopic : `trustbus/${mac}`,
         mqttSubscribe : `trustbus/${mac}`,
-        mqttScanRate : 10000,
         defaultConfigs : true,
       })
 

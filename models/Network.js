@@ -19,7 +19,9 @@ const Network = mongoose.model(
             },
             gateway: {
                 type: String,
-                required: true
+            },
+            mac: {
+                type: String,
             },
             modbusScanRate: {
                 type: Number,
@@ -49,13 +51,8 @@ const Network = mongoose.model(
                 type: String,
                 
             },
-            mqttScanRate: {
-                type: String,
-                required: true
-            },
             defaultConfigs: {
                 type: Boolean,
-                required: true
             },
         },
         { timestamps: true },

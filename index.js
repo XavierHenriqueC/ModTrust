@@ -40,6 +40,10 @@ app.use('/task', TaskRoutes)
 const ModbusDataRoutes = require('./routes/ModbusDataRoutes');
 app.use('/modbusdata', ModbusDataRoutes)
 
+//Rota de Network
+const NetworkRoutes = require('./routes/NetworkRoutes');
+app.use('/network', NetworkRoutes)
+
 //Porta API
 app.listen(3000);
 
