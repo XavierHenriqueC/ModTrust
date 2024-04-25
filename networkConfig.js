@@ -9,7 +9,7 @@ const systemOS = os.platform()
 const ipConfigs = os.networkInterfaces().Ethernet[1]
 const mac = ipConfigs.mac.replace(/:/g, "")
 
-
+console.log(os.networkInterfaces())
 
 // Função para configurar a rede
 function configurarRede(ip, subnetMask, gateway) {

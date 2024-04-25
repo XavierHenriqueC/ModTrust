@@ -1,0 +1,94 @@
+.config-container {
+    position: relative;
+    border: 1px solid #777;
+    border-radius: 10px;
+    width: 20vw;
+    padding:2rem 1rem;
+    margin:1rem 0;
+    height: auto;
+}
+
+.config-container .title,
+.status-container .title {
+    position: absolute;
+    top: -10px;
+    left: 10%;
+    background-color: #ddd;
+    padding:0 0.3rem;
+}
+
+.config-container form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: 1rem;
+}
+
+.config-container .form-control {
+    display: flex;
+    width: 100%;
+}
+
+.config-container label {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.config-container input[type="text"],
+.config-container input[type="number"],
+.config-container input[type="password"],
+.config-container select {
+    max-width: 52%;
+    height: 1.3rem;
+    padding: 0.1rem 0.3rem;
+    border: none;
+    border: 1px solid #666;
+    border-radius: 2px;
+}
+
+.config-container select {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* CHECKBOX STYLES */
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        border: 1px solid #666;
+        width: 1.3rem;
+        height: 1.3rem;
+        border-radius: 2px;
+        background-color: white;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    /* Estilo quando o checkbox está marcado */
+    input[type="checkbox"]:checked {
+        background-color: #222; /* Cor de fundo quando marcado */
+        border-color: #222; /* Cor do contorno quando marcado */
+    }
+    
+    /* Estilo do marcador quando o checkbox está marcado */
+    input[type="checkbox"]:checked::before {
+        content: "✔"; /* Símbolo de marca de seleção */
+        color: white; /* Cor do símbolo */
+    }
+/* CHECKBOX STYLES */
+
+.status-container {
+    position: relative;
+    border: 1px solid #777;
+    border-radius: 10px;
+    width: 80%;
+    height: 100%;
+    padding:2rem 1rem;
+    margin:1rem 0;
+}

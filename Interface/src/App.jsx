@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 
 import Logo from "./img/favicon_round.png"
+import Network from './routes/Network'
 
 function App() {
 
@@ -28,7 +29,7 @@ function App() {
         <div className="logo">
           <img src={Logo} alt="logo datatrust" />
         </div>
-        <p>Modtrust Gateway</p>
+        <p>TrustBus Gateway</p>
         <p>MAC: awfa788556dwd</p>
       </div>
       <div className="body">
@@ -50,7 +51,7 @@ function App() {
 
         </div>
         <div className="center">
-          
+            {navState.network && <Network />}
         </div>
         
       </div>
