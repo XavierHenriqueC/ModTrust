@@ -51,9 +51,6 @@ async function connectBrokerMqtt () {
 
 }
 
-connectBrokerMqtt()
-
-
 //Publica mensagem MQTT
 const publishData = async (network,variables) => {
 

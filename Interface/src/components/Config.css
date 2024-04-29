@@ -3,9 +3,8 @@
     border: 1px solid #777;
     border-radius: 10px;
     width: 20vw;
-    padding:2rem 1rem;
+    padding:1rem 1rem;
     margin:1rem 0;
-    height: auto;
 }
 
 .config-container .title,
@@ -40,7 +39,7 @@
 .config-container input[type="number"],
 .config-container input[type="password"],
 .config-container select {
-    max-width: 52%;
+    max-width: 48%;
     height: 1.3rem;
     padding: 0.1rem 0.3rem;
     border: none;

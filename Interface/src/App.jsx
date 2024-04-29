@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import './App.css'
 
 import Logo from "./img/favicon_round.png"
 import Network from './routes/Network'
 
+import { Context } from '../context/Context'
+
 function App() {
+
+  const { network } = useContext(Context)
 
   const [navState, setNavState] = useState({network: true, devices: false, tasks: false})
 
@@ -30,7 +34,7 @@ function App() {
           <img src={Logo} alt="logo datatrust" />
         </div>
         <p>TrustBus Gateway</p>
-        <p>MAC: awfa788556dwd</p>
+        <p>MAC: {network.mac}</p>
       </div>
       <div className="body">
         <div className="sidebar">
@@ -51,9 +55,15 @@ function App() {
 
         </div>
         <div className="center">
+          <div className="center-content">
             {navState.network && <Network />}
+          </div>
+          <div className="console">
+            <div className="console-box">
+              <p className='label'>Console:</p>
+            </div>
+          </div>
         </div>
-        
       </div>
     </div>
   )

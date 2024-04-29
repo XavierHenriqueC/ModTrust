@@ -1,9 +1,11 @@
 // create a tcp modbus client
 const Modbus = require('jsmodbus');
 const net = require('net');
+const SerialPort = require('serialport')
 
 //Importa model mongo
 const Device = require('./models/Device')
+const Network = require('./models/Network')
 
 const {
     isFloat,
@@ -21,13 +23,30 @@ const {
 // Classe para configuração da conexão com o dispositivo
 class DeviceConfigurator {
     
-    constructor(name, host, port, unitId, timeout, baseAddress) {
+    constructor(type, name, host, port, unitId, timeout, baseAddress, baudRate, parity, stopBits, dataBits) {
+        
+        //TCP
+        if(type === 'tcp') {
+            this.socket = new net.Socket();
+            this.client = new Modbus.client.TCP(this.socket, this.unitId);
+        }
+
+        //Serial
+        if (type === "serial") {
+            this.socket = new SerialPort('/dev/ttyUSB0', {
+                baudRate: baudRate,
+                Parity: parity,
+                stopBits: stopBits,
+                dataBits: dataBits
+            })
+            this.client = new Modbus.client.RTU(socket, unitId)
+        }
+
         this.name = name;
         this.unitId = unitId;
         this.baseAddress = baseAddress;
         this.timeout = timeout;
-        this.socket = new net.Socket();
-        this.client = new Modbus.client.TCP(this.socket, this.unitId);
+       
         this.options = {
             'host': host,
             'port': port,
@@ -343,6 +362,10 @@ async function scanModbus(connections) {
 const getConnectionsFromDb = async () => {
     
     let connections = []
+
+    const networks = await Network.find()
+    const network = networks[0]
+    
     try {
         const devices = await Device.find()
 
@@ -363,7 +386,7 @@ const getConnectionsFromDb = async () => {
             })
 
             const obj = {
-                device: new DeviceConfigurator (item.name, item.ip, item.port, item.unitId, item.timeout, item.baseAddress),
+                device: new DeviceConfigurator (item.type, item.name, item.ip, item.port, item.unitId, item.timeout, item.baseAddress, network.serialBaudRate, network.serialParity, network.serialStopBits, network.serialDataBits),
                 writes: writes,
                 reads: reads
             }

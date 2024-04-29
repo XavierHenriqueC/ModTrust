@@ -2,7 +2,7 @@
 const { configurarRedeUsuario, setDefault } = require('./networkConfig')
 
 //Import Modbus
-const { modbusMqtt } = require('./modbus_mqtt');
+const { modbusMqtt, connectBrokerMqtt } = require('./modbus_mqtt');
 
 //Import Network
 const Network = require('./models/Network');
@@ -55,8 +55,14 @@ async function main () {
     const networks = await Network.find()
     const network = networks[0]
 
-    //Configura parametros da placa de rede no sistema do Host
-    configurarRedeUsuario(network.mode, network.ip, network.netmask, network.gateway);
+    //Configura parametros da placa de rede LAN
+    configurarRedeUsuario("Ethernet","eth0", network.mode, network.ip, network.netmask, network.gateway);
+
+    //Configura parametros da placa de rede WAN
+    //configurarRedeUsuario("Ethernet 1","eth1", network.modeWan, network.ipWan, network.netmaskWan, network.gatewayWan);
+
+    //Conecta com o Broker MQTT
+    await connectBrokerMqtt()
 
     //Executa Modbus e MQTT
     modbusMqtt ()

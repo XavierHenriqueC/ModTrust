@@ -12,7 +12,32 @@ module.exports = class NetworkController {
     
     static async editDeviceById (req, res) {
 
-        const { id, mode, ip, netmask, gateway, modbusScanRate, mqttHost, mqttPort, mqttUsername, mqttPassword, mqttTopic, mqttSubscribe, defaultConfigs } = req.body
+        const { 
+            id,
+            mode,
+            ip, 
+            netmask, 
+            gateway, 
+            modeWan, 
+            ipWan, 
+            netmaskWan, 
+            gatewayWan,
+            wifiEnable,
+            wifiSSID,
+            wifiPassword,
+            serialBaudRate,
+            serialParity,
+            serialDataBits,
+            serialStopBits,  
+            modbusScanRate, 
+            mqttHost, 
+            mqttPort, 
+            mqttUsername, 
+            mqttPassword, 
+            mqttTopic, 
+            mqttSubscribe, 
+            defaultConfigs 
+        } = req.body
         
         if(!id) {
             res.status(422).json({message: "O id é obrigatório"})
@@ -34,7 +59,7 @@ module.exports = class NetworkController {
             return;
         }
 
-        //Validações
+        //Validações porta LAN
         if(!mode) {
             res.status(422).json({message: "O mode é obrigatório"})
             return;
@@ -78,15 +103,123 @@ module.exports = class NetworkController {
 
         if (gateway) {
             network.gateway = gateway
+        } else {
+            network.gateway = ""
         }
 
+        //Validações porta WAN
+        if(!modeWan) {
+            res.status(422).json({message: "O modeWan é obrigatório"})
+            return;
+        }
+
+        network.modeWan = modeWan
+
+        if(!ipWan) {
+            res.status(422).json({message: "O ipWan é obrigatório"})
+            return;
+        }
+
+        if(!validarEnderecoIP(ipWan)) {
+            res.status(422).json({message: "Endereço de IPWan é invalido"})
+            return;
+        }
+
+        network.ipWan = ipWan
+
+        if(!netmaskWan) {
+            res.status(422).json({message: "O netmaskWan é obrigatório"})
+            return;
+        }
+
+        if(!validarEnderecoIP(netmaskWan)) {
+            res.status(422).json({message: "Endereço de netmaskWan é invalido"})
+            return;
+        }
+
+        network.netmaskWan = netmaskWan
+
+        if(!gatewayWan) {
+            res.status(422).json({message: "O gatewayWan é obrigatório"})
+            return;
+        }
+
+        if(gatewayWan && (!validarEnderecoIP(gatewayWan))) {
+            res.status(422).json({message: "Endereço de gatewayWan é invalido"})
+            return;
+        }
+
+        if (gatewayWan) {
+            network.gatewayWan = gatewayWan
+        } else {
+            network.gatewayWan = ""
+        }
+
+        //Validações WIFI
+        if(wifiEnable !== false && wifiEnable !== true) {
+            res.status(422).json({message: "O wifiEnable é obrigatório"})
+            return;
+        }
+
+        if(wifiEnable) {
+            if(!wifiSSID) {
+                res.status(422).json({message: "O wifiSSID é obrigatório"})
+                return;
+            }
+        }
+
+        network.wifiEnable = wifiEnable
+
+        if(wifiSSID) {
+            network.wifiSSID = wifiSSID
+        } else {
+            network.wifiSSID = ""
+        }
+
+        if(wifiPassword) {
+            network.wifiPassword = wifiPassword
+        } else {
+            network.wifiPassword = ""
+        }
+
+        //Validações SERIAL
+        if(!serialBaudRate) {
+            res.status(422).json({message: "O serialBaudRate é obrigatório"})
+            return;
+        }
+
+        network.serialBaudRate = serialBaudRate
+
+        if(!serialParity) {
+            res.status(422).json({message: "O serialParity é obrigatório"})
+            return;
+        }
+
+        network.serialParity = serialParity
+
+        if(!serialDataBits) {
+            res.status(422).json({message: "O serialDataBits é obrigatório"})
+            return;
+        }
+
+        network.serialDataBits = serialDataBits
+
+        if(!serialStopBits) {
+            res.status(422).json({message: "O serialStopBits é obrigatório"})
+            return;
+        }
+
+        network.serialStopBits = serialStopBits
+
+        //Validações MODBUS
         if(!modbusScanRate) {
             res.status(422).json({message: "O modbusScanRate é obrigatório"})
             return;
         }
 
         network.modbusScanRate = modbusScanRate
-
+        
+        //Validações MQTT CLIENT
         if(!mqttHost) {
             res.status(422).json({message: "O mqttHost é obrigatório"})
             return;
@@ -103,10 +236,14 @@ module.exports = class NetworkController {
         
         if(mqttUsername) {
             network.mqttUsername = mqttUsername
+        } else {
+            network.mqttUsername = ""
         }
         
         if(mqttPassword) {
             network.mqttPassword = mqttPassword
+        } else {
+            network.mqttPassword = ""
         }
 
         if(!mqttTopic) {
@@ -119,7 +256,8 @@ module.exports = class NetworkController {
         if(mqttSubscribe) {
             network.mqttSubscribe = mqttSubscribe
         }
-       
+
+        //Validações DEFAULT CONFIGS
         if(!defaultConfigs) {
             res.status(422).json({message: "O defaultConfigs é obrigatório"})
             return;
@@ -169,8 +307,11 @@ async function reconfigRede () {
         const networks = await Network.find()
         const network = networks[0]
 
-        //Configura parametros da placa de rede no sistema do Host
-        configurarRedeUsuario(network.mode, network.ip, network.netmask, network.gateway);
+        //Reconfigura parametros da placa de rede LAN
+        configurarRedeUsuario("Ethernet","eth0", network.mode, network.ip, network.netmask, network.gateway);
+
+        //Reconfigura parametros da placa de rede WAN
+        //configurarRedeUsuario("Ethernet 7","eth1", network.modeWan, network.ipWan, network.netmaskWan, network.gatewayWan);
 
     } catch (err) {
         console.log(err)

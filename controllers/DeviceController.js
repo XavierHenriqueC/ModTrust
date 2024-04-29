@@ -10,9 +10,14 @@ module.exports = class DeviceController {
     
     static async register (req, res) {
 
-        const { name, ip, port, unitId, timeout, baseAddress } = req.body
+        const { type ,name, ip, port, unitId, timeout, baseAddress } = req.body
         
         //Validações
+        if(!type) {
+            res.status(422).json({message: "O type é obrigatório"})
+            return;
+        }
+
         if(!name) {
             res.status(422).json({message: "O nome é obrigatório"})
             return;
@@ -53,6 +58,7 @@ module.exports = class DeviceController {
 
         //Create
         const device = new Device ({
+            type,
             name,
             ip,
             port,
@@ -103,7 +109,7 @@ module.exports = class DeviceController {
 
     static async editDeviceById (req, res) {
 
-        const { id ,name, ip, port, unitId, timeout, baseAddress } = req.body
+        const { id ,type, name, ip, port, unitId, timeout, baseAddress } = req.body
         
         if(!id) {
             res.status(422).json({message: "O id é obrigatório"})
@@ -126,6 +132,13 @@ module.exports = class DeviceController {
         }
 
         //Validações
+        if(!type) {
+            res.status(422).json({message: "O type é obrigatório"})
+            return;
+        }
+
+        device.type = type
+
         if(!name) {
             res.status(422).json({message: "O nome é obrigatório"})
             return;

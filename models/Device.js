@@ -4,7 +4,11 @@ const { Schema } = mongoose;
 const Device = mongoose.model(
     'Device',
     new Schema(
-        {
+        {   
+            type: {
+                type: String,
+                required: true
+            },
             name: {
                 type: String,
                 required: true
@@ -29,7 +33,7 @@ const Device = mongoose.model(
                 type: Number,
                 required: true
             },
-            task: Array
+            task: Array,
 
         },
         { timestamps: true },

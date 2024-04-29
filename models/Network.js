@@ -23,7 +23,48 @@ const Network = mongoose.model(
             mac: {
                 type: String,
             },
+            modeWan: {
+                type: String,
+                required: true
+            },
+            ipWan: {
+                type: String,
+                required: true
+            },
+            netmaskWan: {
+                type: String,
+                required: true
+            },
+            gatewayWan: {
+                type: String,
+            },
+            wifiEnable: {
+                type: Boolean,
+                required: true
+            },
+            wifiSSID: {
+                type: String
+            },
+            wifiPassword: {
+                type: String
+            },
             modbusScanRate: {
+                type: Number,
+                required: true
+            },
+            serialBaudRate: {
+                type: Number,
+                required: true
+            },
+            serialParity: {
+                type: String,
+                required: true
+            },
+            serialDataBits: {
+                type: Number,
+                required: true
+            },
+            serialStopBits: {
                 type: Number,
                 required: true
             },
@@ -36,11 +77,10 @@ const Network = mongoose.model(
                 required: true
             },
             mqttUsername: {
-                type: Number,
-                
+                type: String,
             },
             mqttPassword: {
-                type: Number,
+                type: String,
                 
             },
             mqttTopic: {

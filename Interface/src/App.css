@@ -1,7 +1,7 @@
 .app {
-    width: 100vw;
-    height: 100vw;
-    max-height: 100vh;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -31,7 +31,7 @@
 }
 
 .body {
-    flex: 20;
+    flex:18;
     background-color: #fff;
     display: flex;
     flex-direction: row;
@@ -89,6 +89,36 @@
     flex: 9;
     background-color: #ddd;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+
+.center-content {
+    flex: 20;
+    background-color: #ddd;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.console {
+    display: flex;
+    flex: 1;
+    padding: 0.2rem;
+}
+
+.console-box {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.console .label {
+    color: #666;
+    padding: 0.2rem 1rem;
 }
 
 
