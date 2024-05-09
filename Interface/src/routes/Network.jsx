@@ -1,14 +1,16 @@
-import './Screens.css'
-import Lan from '../components/Lan'
-import Wan from '../components/Wan'
-import MQTTClient  from '../components/MQTTClient'
-import WIFIClient from '../components/WIFIClient'
-import Serial from '../components/Serial'
-import Modbus from '../components/Modbus'
-import NetworkStatus from '../components/NetworkStatus'
 import { useContext, useState, useEffect } from 'react'
 import { Context } from '../../context/Context'
 import { editNetworkById } from '../utils/API'
+
+import Lan from '../components/Network/Lan'
+import Wan from '../components/Network/Wan'
+import MQTTClient  from '../components/Network/MQTTClient'
+import WIFIClient from '../components/Network/WIFIClient'
+import Serial from '../components/Network/Serial'
+import Modbus from '../components/Network/Modbus'
+import NetworkStatus from '../components/Network/NetworkStatus'
+
+import './Screens.css'
 
 const Network = () => {
   

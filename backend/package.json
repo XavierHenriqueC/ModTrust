@@ -1,12 +1,12 @@
 {
-  "name": "facilitiesapi",
+  "name": "trustbus",
   "version": "1.0.0",
-  "description": "Servidor API - Modbus - Industrial",
+  "description": "Gateway Modbus - MQTT",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:script1": "nodemon ./index.js localhost 3000",
-    "start:script2": "cd Interface/nginx_windows && nginx",
+    "start:script2": "cd ../Interface/nginx_windows && nginx",
     "start:all": "concurrently \"npm run start:script1\" \"npm run start:script2\""
   },
   "author": "Henrique Xavier - hxc_henrique@hotmail.com",

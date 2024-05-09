@@ -1,29 +1,35 @@
 import { useState, useContext } from 'react'
 import './App.css'
+import Modal from 'react-modal'
 
 import Logo from "./img/favicon_round.png"
+
 import Network from './routes/Network'
+import Devices from './routes/Devices'
 
 import { Context } from '../context/Context'
+
+// Define o elemento raiz do seu aplicativo
+Modal.setAppElement('#root');
 
 function App() {
 
   const { network } = useContext(Context)
 
-  const [navState, setNavState] = useState({network: true, devices: false, tasks: false})
+  const [navState, setNavState] = useState({network: true, devices: false, status: false})
 
   //Função para navegação da sidebar
   const handlerNav = (button) => {
     if(button === "network") {
-      setNavState({network: true, devices: false, tasks: false})
+      setNavState({network: true, devices: false, status: false})
     }
 
     if(button === "devices") {
-      setNavState({network: false, devices: true, tasks: false})
+      setNavState({network: false, devices: true, status: false})
     }
 
-    if(button === "tasks") {
-      setNavState({network: false, devices: false, tasks: true})
+    if(button === "status") {
+      setNavState({network: false, devices: false, status: true})
     }
   }
  
@@ -47,9 +53,9 @@ function App() {
               <ion-icon name="cube-outline"></ion-icon>
               <p>Devices</p>
             </div>
-            <div onClick={() => handlerNav("tasks")} className={`button ${navState.tasks ? "selected" : ""}`}>
-              <ion-icon name="document-attach-outline"></ion-icon>
-              <p>Tasks</p>
+            <div onClick={() => handlerNav("status")} className={`button ${navState.status ? "selected" : ""}`}>
+              <ion-icon name="grid-outline"></ion-icon>
+              <p>Status</p>
             </div>
           </div>
 
@@ -57,6 +63,7 @@ function App() {
         <div className="center">
           <div className="center-content">
             {navState.network && <Network />}
+            {navState.devices && <Devices />}
           </div>
           <div className="console">
             <div className="console-box">

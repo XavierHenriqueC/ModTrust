@@ -1,4 +1,4 @@
-import "./Config.css"
+import "../Config.css"
 
 const NetworkStatus = () => {
   return (

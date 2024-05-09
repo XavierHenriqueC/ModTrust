@@ -30,7 +30,7 @@ const Task = mongoose.model(
                 required: true
             },
             variablesName: {
-                type: [String],
+                type: [Object],
                 required: true,
                 validate: {
                     validator: async function(array) {

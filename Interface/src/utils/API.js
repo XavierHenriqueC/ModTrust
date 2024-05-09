@@ -66,7 +66,7 @@ export async function getDeviceById (id) {
 
 export async function registerNewDevice(type, name, ip, port, unitId, timeout, baseAddress) {
 
-  const url = `${urlBase}/clients/register`;
+  const url = `${urlBase}/device/register`;
 
   const body = {
     type: type,

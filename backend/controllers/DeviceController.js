@@ -10,7 +10,7 @@ module.exports = class DeviceController {
     
     static async register (req, res) {
 
-        const { type ,name, ip, port, unitId, timeout, baseAddress } = req.body
+        let { type ,name, ip, port, unitId, timeout, baseAddress } = req.body
         
         //Validações
         if(!type) {
@@ -23,14 +23,20 @@ module.exports = class DeviceController {
             return;
         }
 
-        if(!ip) {
-            res.status(422).json({message: "O ip é obrigatório"})
-            return;
-        }
+        if(type === "tcp") {
 
-        if(!port) {
-            res.status(422).json({message: "A port é obrigatório"})
-            return;
+            if(!ip) {
+                res.status(422).json({message: "O ip é obrigatório"})
+                return;
+            }
+    
+            if(!port) {
+                res.status(422).json({message: "A port é obrigatório"})
+                return;
+            }
+        } else {
+            ip = null
+            port = null
         }
 
         if(!unitId) {
@@ -109,7 +115,7 @@ module.exports = class DeviceController {
 
     static async editDeviceById (req, res) {
 
-        const { id ,type, name, ip, port, unitId, timeout, baseAddress } = req.body
+        let { id ,type, name, ip, port, unitId, timeout, baseAddress } = req.body
         
         if(!id) {
             res.status(422).json({message: "O id é obrigatório"})
@@ -139,6 +145,25 @@ module.exports = class DeviceController {
 
         device.type = type
 
+        if(type === "tcp") {
+
+            if(!ip) {
+                res.status(422).json({message: "O ip é obrigatório"})
+                return;
+            }
+            device.ip = ip;
+
+            if(!port) {
+                res.status(422).json({message: "A port é obrigatório"})
+                return;
+            }
+
+            device.port = port
+        } else {
+            device.ip = null
+            device.port = null
+        }
+
         if(!name) {
             res.status(422).json({message: "O nome é obrigatório"})
             return;
@@ -154,20 +179,6 @@ module.exports = class DeviceController {
 
         device.name = name;
 
-        if(!ip) {
-            res.status(422).json({message: "O ip é obrigatório"})
-            return;
-        }
-
-        device.ip = ip
-
-        if(!port) {
-            res.status(422).json({message: "A port é obrigatório"})
-            return;
-        }
-
-        device.port = port
-
         if(!unitId) {
             res.status(422).json({message: "O unitId é obrigatório"})
             return;
@@ -182,7 +193,7 @@ module.exports = class DeviceController {
 
         device.timeout = timeout
 
-        if(!baseAddress) {
+        if(baseAddress === null || baseAddress === undefined) {
             res.status(422).json({message: "O baseAddress é obrigatório"})
             return;
         }
@@ -212,7 +223,7 @@ module.exports = class DeviceController {
     static async getDevices (req, res) {    
 
         try {
-            const devices = await Device.find().sort('-createdAt')
+            const devices = await Device.find().sort('name')
             res.status(200).json({devices})
 
         } catch (err) {

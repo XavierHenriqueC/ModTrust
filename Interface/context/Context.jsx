@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 
-import { getAllNetworks } from "../src/utils/API";
+import { getAllDevices, getAllNetworks, getAllTasks } from "../src/utils/API";
 
 export const Context = createContext();
 
@@ -9,15 +9,27 @@ export const ContextProvider =({ children }) => {
   const [failMessage ,setFailMessage] = useState("")
 
   const [ network, setNetwork ] = useState({})
+  const [ devices, setDevices ] = useState([])
+  const [ tasks, setTasks ] = useState([])
 
   //Função para puxar configurações de Network
-  const getNetwork = async () => {
+  const getInfos = async () => {
     
     try {
+      
+      //Networks
       const allnetworks = await getAllNetworks()
       const Network = allnetworks.network[0]
-     
+      
+      //Devices
+      const Devices = await getAllDevices()
+
+      //Tasks
+      const Tasks = await getAllTasks()
+      
       setNetwork(Network)
+      setDevices(Devices.devices)
+      setTasks(Tasks.tasks)
 
     } catch (error) {
       
@@ -38,7 +50,7 @@ export const ContextProvider =({ children }) => {
   }
 
   useEffect(() => {
-    getNetwork()
+    getInfos()
   },[])
     
   return (
@@ -48,6 +60,10 @@ export const ContextProvider =({ children }) => {
       setNetwork,
       failMessage,
       setFailMessage,
+      devices,
+      getInfos,
+      tasks,
+      setTasks,
     }}
     >
       {children}

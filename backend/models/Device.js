@@ -15,11 +15,9 @@ const Device = mongoose.model(
             },
             ip: {
                 type: String,
-                required: true
             },
             port: {
                 type: Number,
-                required: true
             },
             unitId: {
                 type: Number,

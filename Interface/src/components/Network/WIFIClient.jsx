@@ -1,13 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
-import { Context } from '../../context/Context'
+import { Context } from '../../../context/Context'
 
-import './Config.css'
+import '../Config.css'
 
 const WIFIClient = () => {
 
     const { network, setNetwork } = useContext(Context)
-
-    console.log(network.wifiEnable)
 
     return (
         <div className='config-container'>

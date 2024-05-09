@@ -1,0 +1,40 @@
+.table-body table {
+    width: 80%;
+    border-collapse: collapse;
+    border-radius: 10px; /* Adicionando bordas arredondadas */
+    overflow: hidden; /* Para garantir que a borda arredondada seja aplicada corretamente */
+}
+
+.table-header {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.table-body th, td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.table-body thead th {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.table-body th{
+    background-color: #ddd;
+}
+
+.table-body tr:nth-child(even) {
+    background-color: lightgray;
+}
+
+.table-body tr:nth-child(odd) {
+    background-color: white;
+}
+
+.table-body tr:hover {
+    background-color: rgb(117, 192, 253);
+    cursor: pointer;
+}

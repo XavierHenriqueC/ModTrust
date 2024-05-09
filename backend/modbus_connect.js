@@ -1,7 +1,7 @@
 // create a tcp modbus client
 const Modbus = require('jsmodbus');
 const net = require('net');
-const SerialPort = require('serialport')
+const {SerialPort} = require('serialport')
 
 //Importa model mongo
 const Device = require('./models/Device')
@@ -20,11 +20,15 @@ const {
     float32ToModbusRegisters
 } = require('./modbus_converts');
 
+
 // Classe para configuração da conexão com o dispositivo
 class DeviceConfigurator {
     
     constructor(type, name, host, port, unitId, timeout, baseAddress, baudRate, parity, stopBits, dataBits) {
         
+       
+        this.type = type;
+
         //TCP
         if(type === 'tcp') {
             this.socket = new net.Socket();
@@ -33,13 +37,14 @@ class DeviceConfigurator {
 
         //Serial
         if (type === "serial") {
-            this.socket = new SerialPort('/dev/ttyUSB0', {
+            this.socket = new SerialPort({
+                path: '/dev/ttyUSB0',
                 baudRate: baudRate,
-                Parity: parity,
-                stopBits: stopBits,
-                dataBits: dataBits
+                parity: parity,
+                stopbits: stopBits,
+                databits: dataBits
             })
-            this.client = new Modbus.client.RTU(socket, unitId)
+            this.client = new Modbus.client.RTU(this.socket, this.unitId)
         }
 
         this.name = name;
@@ -62,11 +67,13 @@ class DeviceConfigurator {
             this.disconnect();
         });
 
-        this.socket.setTimeout(this.timeout, () => {
-            console.error(`Connection to ${this.name} timed out`);
-            this.disconnect();
-        });
-
+        if(this.type === "tcp") {
+            this.socket.setTimeout(this.timeout, () => {
+                console.error(`Connection to ${this.name} timed out`);
+                this.disconnect();
+            });
+        }
+        
         this.socket.on('connect', () => {
             this.started()
         });

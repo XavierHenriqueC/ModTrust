@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
-import { Context } from '../../context/Context'
+import { Context } from '../../../context/Context'
 
-import './Config.css'
+import '../Config.css'
 
 
 const Wan = () => {
