@@ -29,20 +29,17 @@ const Task = mongoose.model(
                 type: String,
                 required: true
             },
-            variablesName: {
-                type: [Object],
-                required: true,
-                validate: {
-                    validator: async function(array) {
-                      // Verificar se há duplicatas no array
-                      if (array.length !== new Set(array).size) {
-                        return false;
-                      }
-                      return true;
-                    },
-                    message: props => `As strings no array ${props.path} devem ser únicas`
+            variablesName: [{
+                variable: {
+                    type: String,
+                    required: true,
+                    unique: true
+                },
+                mqttpub: {
+                    type: Boolean,
+                    default: false
                 }
-            },
+            }],
         },
         { timestamps: true },
     )
@@ -52,7 +49,7 @@ const Task = mongoose.model(
         
         // Se o array foi atualizado, verifique a unicidade das strings
         if (array) {
-          const count = await Task.countDocuments({ variablesName: { $in: array } });
+          const count = await Task.countDocuments({ 'variablesName.variable': { $in: array.map(obj => obj.variable) } });
           if (count > 1) {
             throw new Error('Esse nome de variavel já existe, insira um novo nome');
           }
@@ -60,6 +57,6 @@ const Task = mongoose.model(
       
         next();
     }),
-)
+);
 
 module.exports = Task;

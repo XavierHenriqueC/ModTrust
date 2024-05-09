@@ -1,7 +1,6 @@
 //Importa Models
 const Task = require('../models/Task')
 const Device = require('../models/Device')
-const SelectedToMqtt = require('../models/SelectedToMqtt')
 
 //Helpers
 const {isValidId} = require("../helpers/validate-id")
@@ -92,10 +91,11 @@ module.exports = class TaskController {
             }
 
             function validaNames(array) {
+                
                 for (let i = 0; i < array.length; i++) {
-                    const test = validarString(array[i]);
+                    const test = validarString(array[i].variable);
                     if (!test) {
-                        return { status: false, varName: array[i] };
+                        return { status: false, varName: array[i].variable };
                     }
                 }
                 return { status: true, varName: "" };
@@ -116,11 +116,11 @@ module.exports = class TaskController {
                 // Itera sobre o array
                 for (let i = 0; i < array.length; i++) {
                     // Se o elemento já existe no objeto contador, retorna true
-                    if (contador[array[i]]) {
+                    if (contador[array[i].variable]) {
                         return true;
                     } else {
                         // Caso contrário, incrementa o contador para esse elemento
-                        contador[array[i]] = 1;
+                        contador[array[i].variable] = 1;
                     }
                 }
                 // Se nenhum elemento foi repetido, retorna false
@@ -133,14 +133,15 @@ module.exports = class TaskController {
             }
         
         
-            //Checa se algum nome ja existe no db
+            // Checa se algum nome já existe no banco de dados
             async function checkNameExists(variablesName) {
                 return new Promise(async (resolve, reject) => {
                     try {
                         const itensPromises = variablesName.map(async (element) => {
-                            return await Task.findOne({ variablesName: { $in: [element] } });
+                            // Aqui, estamos verificando se algum documento possui a variável com o mesmo nome
+                            return await Task.findOne({ 'variablesName.variable': element.variable });
                         });
-            
+
                         const itens = await Promise.all(itensPromises);
                         const found = itens.some(item => item !== null);
                         resolve(found);
@@ -149,13 +150,14 @@ module.exports = class TaskController {
                     }
                 });
             }
-            
-            const variableNameExists = await checkNameExists(variablesName)
 
-            if(variableNameExists) {
-                res.status(422).json({message: "Esse nome de variavel já existe, insira um novo nome"})
-                return
+            const variableNameExists = await checkNameExists(variablesName);
+
+            if (variableNameExists) {
+                res.status(422).json({ message: "Esse nome de variável já existe, insira um novo nome" });
+                return;
             }
+
         //
         
         //Create
@@ -309,9 +311,9 @@ module.exports = class TaskController {
 
             function validaNames(array) {
                 for (let i = 0; i < array.length; i++) {
-                    const test = validarString(array[i]);
+                    const test = validarString(array[i].variable);
                     if (!test) {
-                        return { status: false, varName: array[i] };
+                        return { status: false, varName: array[i].variable };
                     }
                 }
                 return { status: true, varName: "" };
@@ -332,11 +334,11 @@ module.exports = class TaskController {
                 // Itera sobre o array
                 for (let i = 0; i < array.length; i++) {
                     // Se o elemento já existe no objeto contador, retorna true
-                    if (contador[array[i]]) {
+                    if (contador[array[i].variable]) {
                         return true;
                     } else {
                         // Caso contrário, incrementa o contador para esse elemento
-                        contador[array[i]] = 1;
+                        contador[array[i].variable] = 1;
                     }
                 }
                 // Se nenhum elemento foi repetido, retorna false
@@ -362,8 +364,6 @@ module.exports = class TaskController {
             )
 
             await updateTaskInDevice(task.deviceId, id)
-
-            await updateVarsToMqtt()
 
             res.status(200).json({message: "Task atualizada com sucesso!"})
 
@@ -418,8 +418,6 @@ module.exports = class TaskController {
 
             //Deleta cliente
             await Task.findByIdAndDelete(id)
-
-            await updateVarsToMqtt()
 
             res.status(200).json({message: "Task deletada com sucesso"})
 
@@ -516,33 +514,5 @@ async function deleteTaskInDevice(deviceId, taskId) {
     } catch (err) {
         console.error(`Erro ao tentar deletar o Task no Device: ${err}`);
         throw err; // Re-throw the error for handling outside the function
-    }
-}
-
-
-//Verifica modificações na task e limpa VarsToMqtt se necessário
-
-async function updateVarsToMqtt() {
-    const tasks = await Task.find()
-
-    let variables = []
-    
-    tasks.forEach((item) => {
-        item.variablesName.forEach((variable) => {
-            variables.push(variable)
-        })
-    })
-
-    if(variables.length > 0) {
-        
-        const varsToMqtt = await SelectedToMqtt.find()
-        console.log(varsToMqtt)
-        console.log(variables)
-        varsToMqtt.forEach(async (item) => {
-            if(!variables.includes(item.name)){
-                await SelectedToMqtt.findOneAndDelete({name: item.name})
-            }
-        })
-    
     }
 }

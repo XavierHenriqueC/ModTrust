@@ -346,7 +346,7 @@ async function scanModbus(connections) {
 
                         // console.log(values) debug
                         values.forEach((value, index) => {
-                            const variableName = read.variablesName[index];
+                            const variableName = read.variablesName[index].variable;
                             modbusVariables[variableName] = value;
                         
                         });

@@ -5,9 +5,8 @@ const { scanModbus, getConnectionsFromDb } = require('./modbus_connect');
 const mqtt = require('mqtt');
 
 //Import dados da Network
-const Network = require('./models/Network')
-
-const SelectedToMqtt = require('./models/SelectedToMqtt')
+const Network = require('./models/Network');
+const Task = require('./models/Task');
 
 //Configurações MQTT
 let mqttConfig = {
@@ -54,15 +53,21 @@ async function connectBrokerMqtt () {
 //Publica mensagem MQTT
 const publishData = async (network,variables) => {
 
-    const varsToMqtt = await SelectedToMqtt.find()
-
-    let variablesToMqtt = varsToMqtt.map((item) => {
-        return item.name;
-    });
+    const Tasks = await Task.find()
     
+    const variablesToMqtt = Tasks.flatMap((task) => {
+        const variablesName = task.variablesName
+        return variablesName.map((item) => {
+            if(item.mqttpub) {
+                return item.variable
+            }
+        })
+    })
+
+
     function convertObjToArray(obj) {
         return Object.entries(obj)
-            .filter(([key, value]) => variablesToMqtt.includes(key)) // Filtrando apenas as chaves que pertencem ao array de variáveis
+            .filter(([key]) => variablesToMqtt.includes(key)) // Filtrando apenas as chaves que pertencem ao array de variáveis
             .map(([key, value]) => ({
                 variable: key,
                 value: value

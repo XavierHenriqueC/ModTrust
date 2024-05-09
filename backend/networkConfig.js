@@ -144,7 +144,7 @@ async function setDefault () {
         
         network.modbusScanRate = 10000
         
-        network.mqttHost = 'mqtt://34.125.20.251'
+        network.mqttHost = 'mqtt://3.130.230.108'
         network.mqttPort = 1883
         network.mqttUsername = ''
         network.mqttPassword = ''
@@ -188,7 +188,7 @@ async function setDefault () {
 
         modbusScanRate : 10000,
         
-        mqttHost : 'mqtt://34.125.20.251',
+        mqttHost : 'mqtt://3.130.230.108',
         mqttPort : 1883,
         mqttUsername : '',
         mqttPassword : '',
