@@ -32,7 +32,7 @@ const EditDevice = ({ isOpen, closeModal, id }) => {
   const getDevice = async () => {
     try {
       const Device = await getDeviceById(id)
-      console.log(Device)
+     
       setDevice(Device.device)
     } catch (error) {
       console.log(error)

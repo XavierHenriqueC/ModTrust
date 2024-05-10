@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext } from 'react'
 import { Context } from '../../context/Context'
 import { editNetworkById } from '../utils/API'
 
@@ -14,7 +14,7 @@ import './Screens.css'
 
 const Network = () => {
   
-  const { network, setFailMessage } = useContext(Context)
+  const { network } = useContext(Context)
 
   const handleSaveButton = async () => {
       

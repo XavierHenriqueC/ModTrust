@@ -1,11 +1,14 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { deleteTask } from '../../utils/API';
 
 import '../modal.css'
+import { Context } from '../../../context/Context';
 
 const DeleteTask = ({ close, id }) => {
 
   const deleteTasks = async () => {
+
+    const { getInfos } = useContext(Context)
     
     try {
 
@@ -15,6 +18,7 @@ const DeleteTask = ({ close, id }) => {
 
       await Promise.all(promise)
       
+      await getInfos()
       close(true)
 
     } catch (error) {

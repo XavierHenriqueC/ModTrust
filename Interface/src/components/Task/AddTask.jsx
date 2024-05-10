@@ -1,28 +1,26 @@
 import { useContext, useEffect, useState } from 'react';
-
-import { registerNewTask, registerVarToMqtt } from '../../utils/API';
-
 import { Context } from '../../../context/Context';
+
+import { registerNewTask } from '../../utils/API';
 
 import './Tasks.css'
 
+
 const AddTask = ({ close, deviceId }) => {
+
+  const { getInfos } = useContext(Context)
 
   const [newTask, setNewTask] = useState({functionCode: 1, dataType: "bool", address: 1, elements: 1, variablesName: []})
 
-  const [varsToMqtt, setVarsToMqtt] = useState([])
-
   const [failMessage, setFailMessage] = useState({status: false, message: ''})
+
+  const [variablesName, setVariablesName] = useState([])
 
   const addTask = async () => {
     try {
 
-      await registerNewTask( deviceId, "read", newTask.functionCode, newTask.address, newTask.elements, newTask.dataType, newTask.variablesName)
-
-      await Promise.all(varsToMqtt.map(async(item) => {
-        await registerVarToMqtt(item)
-      }))
-
+      await registerNewTask( deviceId, "read", newTask.functionCode, newTask.address, newTask.elements, newTask.dataType, variablesName)
+      await getInfos()
       close(true)
 
     } catch (error) {
@@ -38,9 +36,65 @@ const AddTask = ({ close, deviceId }) => {
       }
       //Ativa label de fail
       setFailMessage({status: true, message: messageError});
-    } 
+    }
 
   }
+
+  //Constroi array de variablesName de acordo com a quantidade de elementos e datatype
+  const handleVariablesName = () => {
+
+    //Zera array
+    setVariablesName([])
+    
+    //Defini quantidade de variaveis
+    let quantity = 0
+    
+    if (newTask.dataType === "bool" || newTask.dataType === "int16" || newTask.dataType === "uint16") {
+      quantity = newTask.elements
+    } else {
+      quantity = newTask.elements / 2
+    }
+
+    //Injeta os objetos no array
+    for (let index = 0; index < quantity; index++) {
+      let obj = {variable: "", mqttpub: false}
+      setVariablesName((prevState) => [...prevState, obj])
+    }
+
+  }
+
+  //Função para atribuir os valores vindo dos inputs de variablesName para o array de variablesName
+  const handleVariablesNameChange = (key, value, index) => {
+    const newVariablesName = variablesName.map((variablesName, i) => {
+
+      if (i === index) {
+        if (variablesName.variable === key) {
+          return {
+            ...variablesName,
+            variable: value,
+          };
+
+        }
+
+        else if (variablesName.mqttpub === key) {
+          return {
+            ...variablesName,
+            mqttpub: value,
+          };
+        }
+
+        else {
+          return variablesName;
+        }
+
+      } else {
+        return variablesName;
+      }
+
+    });
+    setVariablesName(newVariablesName);
+  }
+
 
   const handleSubmit = () => {
     addTask()
@@ -66,9 +120,8 @@ const AddTask = ({ close, deviceId }) => {
 
   useEffect(() => {
     setFailMessage({status: false, message: ""})
-    console.log(newTask)
  
-    if(newTask.address < 0 || newTask.address === "" || newTask.address == NaN) {
+    if(newTask.address < 0 || newTask.address === "" || newTask.address === NaN) {
       setNewTask({ ...newTask, address:0})
     }
 
@@ -76,7 +129,7 @@ const AddTask = ({ close, deviceId }) => {
       setNewTask({ ...newTask, address:65535})
     }
 
-    if(newTask.elements < 0 || newTask.elements === "" || newTask.elements == NaN) {
+    if(newTask.elements < 0 || newTask.elements === "") {
       setNewTask({ ...newTask, elements:0})
     }
 
@@ -87,75 +140,22 @@ const AddTask = ({ close, deviceId }) => {
   },[newTask])
 
   useEffect (() => {
-    handleQntVariaveis()
-    setVarsToMqtt([])
+    handleVariablesName()
   },[newTask.functionCode, newTask.dataType, newTask.elements])
 
   useEffect(() => {
     if(newTask.functionCode === 3 || newTask.functionCode === 4) {
-      console.log('entrou aqui')
       setNewTask({...newTask, dataType: 'uint16'}) 
     }
   },[newTask.functionCode])
 
-  const handleQntVariaveis = () => {
-
-    const dataType = newTask.dataType
-    const functionCode = newTask.functionCode
-
-    if(functionCode == "1" || functionCode == "2" || dataType === "uint16" || dataType === "int16") {
-     
-      const aux = []
-      for (let index = 0; index < newTask.elements; index++) {
-        aux.push('')
-      }
-
-      setNewTask({...newTask, variablesName: aux})
-
-    } else {
-      
-      const aux = []
-      for (let index = 0; index < newTask.elements / 2; index++) {
-        aux.push('')
-      }
-
-      setNewTask({...newTask, variablesName: aux})
-    }
-  
-  }
-
-  const handleChangeVariablesName = (value, i) => {
-    const newVariablesName = newTask.variablesName.map((item, index) => {
-      if(i === index) {
-        return value
-      } else {
-        return item
-      }
-    })
-
-    setNewTask({...newTask, variablesName: newVariablesName})
-  }
-
-  const handleSelectToMqtt = (value, i) => {
-    
-    newTask.variablesName.forEach((item, index) => {
-      if(i === index) {
-        if(value) {
-          setVarsToMqtt([...varsToMqtt, item])
-        } else {
-          let arr = varsToMqtt
-          let novoArray = arr.filter(function (string) {
-          return string !== item;
-          });
-          setVarsToMqtt(novoArray)
-        }
-      }
-    })
-  }
+  useEffect(() => {
+    handleVariablesName()
+  },[])
 
   useEffect(() => {
-    console.log(varsToMqtt)
-  },[varsToMqtt])
+    setFailMessage({status: false, message: ""})
+  },[variablesName])
 
   return (
     <div className="add-task">
@@ -217,11 +217,11 @@ const AddTask = ({ close, deviceId }) => {
                 </tr>
             </thead>
             <tbody>
-              {newTask.variablesName.map((item, i) =>(
-                <tr key={i}>
-                  <td>{newTask.dataType === "uint16" || newTask.dataType === "int16" || newTask.dataType === "bool" ? (newTask.address + i) : (`${newTask.address + (i * 2)} - ${newTask.address + (i * 2) + 1}`)}</td>
-                  <td><input value={item} onChange={(e) => handleChangeVariablesName(e.target.value, i)}></input></td>
-                  <td style={{width: '4rem'}}><input style={{height:'20px', width:"20px", margin:'0 auto'}} type='checkbox' onChange={(e) => handleSelectToMqtt(e.target.checked, i)}></input></td>
+              {variablesName.map((item, index) =>(
+                <tr key={index}>
+                  <td>{newTask.dataType === "uint16" || newTask.dataType === "int16" || newTask.dataType === "bool" ? (newTask.address + index) : (`${newTask.address + (index * 2)} - ${newTask.address + (index * 2) + 1}`)}</td>
+                  <td><input value={item.variable} onChange={(e) => handleVariablesNameChange(item.variable , e.target.value, index)} required></input></td>
+                  <td style={{width: '1rem'}}><input type="checkbox" checked={item.mqttpub} onChange={(e) => handleVariablesNameChange(item.mqttpub, e.target.checked, index)}/></td>
                 </tr>
               ))}
             </tbody>

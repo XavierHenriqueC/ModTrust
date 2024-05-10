@@ -6,6 +6,7 @@ import Logo from "./img/favicon_round.png"
 
 import Network from './routes/Network'
 import Devices from './routes/Devices'
+import Status from './routes/Status'
 
 import { Context } from '../context/Context'
 
@@ -64,6 +65,7 @@ function App() {
           <div className="center-content">
             {navState.network && <Network />}
             {navState.devices && <Devices />}
+            {navState.status && <Status />}
           </div>
           <div className="console">
             <div className="console-box">

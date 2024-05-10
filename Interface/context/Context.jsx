@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 
-import { getAllDevices, getAllNetworks, getAllTasks } from "../src/utils/API";
+import { getAllDevices, getAllModbusData, getAllNetworks, getAllTasks } from "../src/utils/API";
 
 export const Context = createContext();
 
@@ -11,6 +11,7 @@ export const ContextProvider =({ children }) => {
   const [ network, setNetwork ] = useState({})
   const [ devices, setDevices ] = useState([])
   const [ tasks, setTasks ] = useState([])
+  const [ modbusData, setModbusData ] = useState([])
 
   //Função para puxar configurações de Network
   const getInfos = async () => {
@@ -26,10 +27,14 @@ export const ContextProvider =({ children }) => {
 
       //Tasks
       const Tasks = await getAllTasks()
-      
+
+      //Modbus Data
+      const ModbusData = await getAllModbusData()
+
       setNetwork(Network)
       setDevices(Devices.devices)
       setTasks(Tasks.tasks)
+      setModbusData(ModbusData)
 
     } catch (error) {
       
@@ -52,7 +57,24 @@ export const ContextProvider =({ children }) => {
   useEffect(() => {
     getInfos()
   },[])
-    
+
+  const getModbusData = async () => {
+    try {
+      const ModbusData = await getAllModbusData()
+      setModbusData(ModbusData)
+    } catch(err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    if(network.modbusScanRate) {
+      setInterval(() => {
+        getModbusData()
+      },network.modbusScanRate)
+    }
+  },[network])
+  
   return (
     <Context.Provider value={{ 
       //Inserir variáveis aqui
@@ -64,6 +86,7 @@ export const ContextProvider =({ children }) => {
       getInfos,
       tasks,
       setTasks,
+      modbusData,
     }}
     >
       {children}

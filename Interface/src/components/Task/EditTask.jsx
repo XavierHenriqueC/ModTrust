@@ -1,23 +1,26 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { getTaskById, editTaskById, getAllVarsToMqtt } from '../../utils/API';
+import { getTaskById, editTaskById } from '../../utils/API';
+import { Context } from '../../../context/Context';
 
 import './Tasks.css'
 
+
 const EditTask = ({ close, id }) => {
+
+  const { getInfos } = useContext(Context)
 
   const [task, setTask] = useState({})
 
   const [failMessage, setFailMessage] = useState({status: false, message: ''})
 
-  const [varsToMqtt, setVarsToMqtt] = useState([])
-
-  const [selectedItens, setSelectedItens ] = useState([])
+  const [variablesName, setVariablesName] = useState([])
 
   const editTask = async () => {
     try {
 
-      await editTaskById( id, "read", task.functionCode, task.address, task.elements, task.dataType, task.variablesName)
+      await editTaskById( id, "read", task.functionCode, task.address, task.elements, task.dataType, variablesName)
+      await getInfos()
       close(true)
 
     } catch (error) {
@@ -42,29 +45,96 @@ const EditTask = ({ close, id }) => {
     try {
       const Task = await getTaskById(id)
       setTask(Task.task)
+      setVariablesName(Task.task.variablesName)
+      
     } catch (err) {
       console.log(err)
+    } finally {
+      handleVariablesName()
     }
   }
 
-  const getVarsToMqtt = async () => {
-    try {
+  //Constroi array de variablesName de acordo com a quantidade de elementos e datatype
+  const handleVariablesName = () => {
 
-      const VarsToMqtt = await getAllVarsToMqtt()
+    if (task.variablesName) {
       
-      setVarsToMqtt(VarsToMqtt)
+      //Defini quantidade de variaveis
+      let quantity = 0
+
+      if(task.functionCode === 1 || task.functionCode === 2) {
+        setTask({ ...task, dataType: 'bool'})
+        quantity = task.elements
+      }
       
-      const aux = VarsToMqtt.map((item) => {
-        return item.name
-      })
+      if (task.dataType === "bool" || task.dataType === "int16" || task.dataType === "uint16") {
+        quantity = task.elements
+      } else {
+        quantity = task.elements / 2
+      }
 
-      setSelectedItens(aux)
+      const lastVariablesName = [...task.variablesName]
 
+      //Injeta os objetos no array
+      if(quantity !== task.variablesName.length) {
+        setVariablesName([])
+        
+        let newVariablesName = []
 
-    } catch (err) {
-        console.log(err)
+        for (let index = 0; index < quantity; index++) {
+          let obj = {variable: "", mqttpub: false}
+          newVariablesName.push(obj)
+        }
+
+        // Copiar os valores da array de origem para a array de destino
+        const novoArrayDestino = newVariablesName.map((elemento, indice) => {
+          if (indice < lastVariablesName.length) {
+            return lastVariablesName[indice];
+          } else {
+            return { variable: "", mqttpub: false };
+          }
+        });
+        
+        // Atualizar o estado do array de destino
+        setVariablesName(novoArrayDestino);
+
+      } else {
+        setVariablesName(lastVariablesName)
+      }
     }
-  } 
+  }
+
+  //Função para atribuir os valores vindo dos inputs de variablesName para o array de variablesName
+  const handleVariablesNameChange = (key, value, index) => {
+    const newVariablesName = variablesName.map((variablesName, i) => {
+
+      if (i === index) {
+        if (variablesName.variable === key) {
+          return {
+            ...variablesName,
+            variable: value,
+          };
+
+        }
+
+        else if (variablesName.mqttpub === key) {
+          return {
+            ...variablesName,
+            mqttpub: value,
+          };
+        }
+
+        else {
+          return variablesName;
+        }
+
+      } else {
+        return variablesName;
+      }
+
+    });
+    setVariablesName(newVariablesName);
+  }
 
   const handleSubmit = () => {
     editTask()
@@ -90,9 +160,8 @@ const EditTask = ({ close, id }) => {
 
   useEffect(() => {
     setFailMessage({status: false, message: ""})
-    //console.log(task)
- 
-    if(task.address < 0 || task.address === "" || task.address == NaN) {
+
+    if(task.address < 0 || task.address === "" || task.address === NaN) {
       setTask({ ...task, address:0})
     }
 
@@ -100,7 +169,7 @@ const EditTask = ({ close, id }) => {
       setTask({ ...task, address:65535})
     }
 
-    if(task.elements < 0 || task.elements === "" || task.elements == NaN) {
+    if(task.elements < 0 || task.elements === "" || task.elements === NaN) {
       setTask({ ...task, elements:0})
     }
 
@@ -110,72 +179,28 @@ const EditTask = ({ close, id }) => {
 
   },[task])
 
+
   useEffect (() => {
-    handleQntVariaveis()
+    handleVariablesName()
   },[task.functionCode, task.dataType, task.elements])
-
-  const handleQntVariaveis = () => {
-    const dataType = task.dataType
-    const functionCode = task.functionCode
-   
-    if(functionCode == "1" || functionCode == "2" || dataType === "uint16" || dataType === "int16") {
-     
-      const aux = []
-      for (let index = 0; index < task.elements; index++) {
-        aux.push('')
-      }
-
-      setTask({...task, variablesName: aux})
-
-    } else {
-      
-      const aux = []
-      for (let index = 0; index < task.elements / 2; index++) {
-        aux.push('')
-      }
-
-      setTask({...task, variablesName: aux})
-    }
-  
-  }
-
-  const handleChangeVariablesName = (value, i) => {
-    const newVariablesName = task.variablesName.map((item, index) => {
-      if(i === index) {
-        return value
-      } else {
-        return item
-      }
-    })
-
-    setTask({...task, variablesName: newVariablesName})
-  }
-
-  const handleSelectToMqtt = (value, i) => {
-    
-    task.variablesName.forEach((item, index) => {
-      if(i === index) {
-        if(value) {
-          setSelectedItens([...selectedItens, item])
-        } else {
-          let arr = selectedItens
-          let novoArray = arr.filter(function (string) {
-          return string !== item;
-          });
-          setSelectedItens(novoArray)
-        }
-      }
-    })
-  }
 
   useEffect(() => {
     getTask()
-    getVarsToMqtt()
   },[])
 
   useEffect(() => {
-    console.log(selectedItens)
-  },[selectedItens])
+    setFailMessage({status: false, message: ""})
+  },[variablesName])
+
+  useEffect(() => {
+    console.log(variablesName)
+  },[variablesName])
+
+  useEffect(() => {
+    console.log(task)
+  },[task])
+
+
 
   return (
     <div className="add-task">
@@ -237,16 +262,11 @@ const EditTask = ({ close, id }) => {
                 </tr>
             </thead>
             <tbody>
-              {task.variablesName && task.variablesName.length > 0 && task.variablesName.map((item, i) =>(
-                <tr key={i}>
-                  <td>{task.dataType === "uint16" || task.dataType === "int16" || task.dataType === "bool" ? (task.address + i) : (`${task.address + (i * 2)} - ${task.address + (i * 2) + 1}`)}</td>
-                  <td><input value={item} onChange={(e) => handleChangeVariablesName(e.target.value, i)}></input></td>
-                  
-                  {selectedItens.map((variable) => {
-                    if (item === variable) {
-                      return <td style={{width: '4rem'}}><input style={{height:'20px', width:"20px", margin:'0 auto'}} type='checkbox' checked={true} onChange={(e) => handleSelectToMqtt(e.target.checked, i)}></input></td>
-                    }
-                  })}
+              {variablesName.map((item, index) =>(
+                <tr key={index}>
+                  <td>{task.dataType === "uint16" || task.dataType === "int16" || task.dataType === "bool" ? (task.address + index) : (`${task.address + (index * 2)} - ${task.address + (index * 2) + 1}`)}</td>
+                  <td><input value={item.variable} onChange={(e) => handleVariablesNameChange(item.variable , e.target.value, index)} required></input></td>
+                  <td style={{width: '1rem'}}><input type="checkbox" checked={item.mqttpub} onChange={(e) => handleVariablesNameChange(item.mqttpub, e.target.checked, index)}/></td>
                 </tr>
               ))}
             </tbody>

@@ -1,12 +1,14 @@
 import { useContext, useState, useEffect } from 'react'
 import { Context } from '../../context/Context'
+
 import AddDevice from '../components/Device/AddDevice'
 import EditDevice from '../components/Device/EditDevice'
 import DeleteDevice from '../components/Device/DeleteDevice'
+import Tasks from '../components/Task/Tasks'
 
 import './Screens.css'
 import './Devices.css'
-import Tasks from '../components/Task/Tasks'
+
 
 const Devices = () => {
 
