@@ -7,8 +7,6 @@ services:
     image: xavierhenriquec/modtrust:latest
     container_name: backend
     restart: always
-    ports:
-      - "3000:3000"
     networks:
       - datanet
 
@@ -26,8 +24,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
       - ./Interface/dist:/usr/share/nginx/html
+      - ./nginx.api.conf:/etc/nginx/conf.d/api.conf
     command: [nginx-debug, '-g', 'daemon off;']
     depends_on:
       - backend
