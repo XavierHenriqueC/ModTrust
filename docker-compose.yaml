@@ -1,14 +1,6 @@
 version: '3.9'
 
 services:
-  mongodb:
-      image: mongo:latest
-      container_name: mongodb
-      restart: always
-      volumes:
-        - ./mongodb:/data/db
-      networks:
-        - datanet
   backend:
     depends_on:
       - mongodb
@@ -20,14 +12,12 @@ services:
     networks:
       - datanet
 
-  frontend-build:
-    image: node
-    working_dir: /app
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
     volumes:
-      - ./Interface:/app
-    command: ["sh", "-c", "npm install && npm run build"]
-    depends_on:
-      - backend
+      - ./mongodb:/data/db
     networks:
       - datanet
 
@@ -37,11 +27,20 @@ services:
       - "8080:80"
     volumes:
       - ./Interface/dist:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
     command: [nginx-debug, '-g', 'daemon off;']
     depends_on:
       - backend
-      - frontend-build
+    networks:
+      - datanet
+
+  frontend-build:
+    image: node
+    working_dir: /app
+    volumes:
+      - ./Interface:/app
+    command: ["sh", "-c", "npm install && npm run build"]
+    depends_on:
+      - backend
     networks:
       - datanet
 
