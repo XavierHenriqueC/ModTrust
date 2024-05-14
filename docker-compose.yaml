@@ -36,6 +36,8 @@ services:
       - datanet
 
   frontend-build:
+    depends_on:
+      - backend
     image: node
     working_dir: /app
     volumes:
