@@ -42,7 +42,7 @@ services:
     working_dir: /app
     volumes:
       - ./Interface:/app
-    command: ["npm", "run", "build"]
+    command: ["sh", "-c", "npm install && npm run build"]
 networks:
   datanet:
     driver: bridge
