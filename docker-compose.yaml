@@ -7,17 +7,13 @@ services:
     image: xavierhenriquec/modtrust:latest
     container_name: backend
     restart: always
-    ports:
-      - "3000:3000"
     networks:
       - datanet
-      
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
     restart: always
-    ports:
-      - "27017:27017"
     volumes:
       - ./mongodb:/data/db
     networks:
@@ -31,20 +27,21 @@ services:
       - ./Interface/dist:/usr/share/nginx/html
     command: [nginx-debug, '-g', 'daemon off;']
     depends_on:
-      - frontend-build
+      - backend
     networks:
       - datanet
 
   frontend-build:
-    depends_on:
-      - backend
     image: node
     working_dir: /app
     volumes:
       - ./Interface:/app
     command: ["sh", "-c", "npm install && npm run build"]
+    depends_on:
+      - backend
     networks:
       - datanet
+
 networks:
   datanet:
     driver: bridge
