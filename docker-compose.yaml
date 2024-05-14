@@ -32,6 +32,8 @@ services:
     command: [nginx-debug, '-g', 'daemon off;']
     depends_on:
       - frontend-build
+    networks:
+      - datanet
 
   frontend-build:
     image: node
@@ -39,6 +41,8 @@ services:
     volumes:
       - ./Interface:/app
     command: ["sh", "-c", "npm install && npm run build"]
+    networks:
+      - datanet
 networks:
   datanet:
     driver: bridge
