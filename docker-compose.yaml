@@ -7,6 +7,8 @@ services:
     image: xavierhenriquec/modtrust:latest
     container_name: backend
     restart: always
+    ports:
+      - "3000:3000"
     networks:
       - datanet
 
