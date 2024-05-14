@@ -1,5 +1,5 @@
 //Configurações Gerais
-const urlBase = 'http://localhost:3000';
+const urlBase = 'http://127.0.0.1:3000';
 
 
 const Headers = {
