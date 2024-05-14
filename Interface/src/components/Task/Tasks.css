@@ -16,7 +16,11 @@
     width: 100%;
     border-collapse: collapse;
     border-radius: 10px; /* Adicionando bordas arredondadas */
-    overflow: hidden; /* Para garantir que a borda arredondada seja aplicada corretamente */
+}
+
+.content {
+    overflow-y: scroll;
+    height: 100%;
 }
 
 .table th, td {
@@ -79,7 +83,6 @@
     height: 100%;
     background-color: #fff;
     border: 1px solid #aaa;
-    overflow-y: scroll;
     padding: 1rem;
     display: flex;
     flex-direction: column;
@@ -89,6 +92,11 @@
 .add-task p {
     font-weight: bold;
     margin-bottom: 0.8rem;
+}
+
+.add-task .variables-name {
+    height: 100%;
+    overflow-y: scroll;
 }
 
 .add-task .variables-name table {
@@ -112,3 +120,5 @@
     padding: 1rem;
     background-color: #fff;
 }
+
+

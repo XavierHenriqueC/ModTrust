@@ -407,7 +407,7 @@ module.exports = class TaskController {
         const task = await Task.findById(id)
         
         if(!task) {
-            res.status(422).json({message: "Task não encontrada"})
+            res.status(422).json({message: `Task não encontrada - id: ${id}`})
             return;
         }
 
@@ -415,9 +415,6 @@ module.exports = class TaskController {
             
             //Deleta task do device
             await deleteTaskInDevice(task.deviceId, id)
-
-            //Deleta cliente
-            await Task.findByIdAndDelete(id)
 
             res.status(200).json({message: "Task deletada com sucesso"})
 
@@ -468,51 +465,35 @@ async function updateTaskInDevice(deviceId, taskId) {
     }
 }
 
-//Deleta task do device
 async function deleteTaskInDevice(deviceId, taskId) {
     try {
-        const device = await Device.findById(deviceId)
+        // Encontrar o documento na coleção pelo ID
+        const device = await Device.findById(deviceId);
 
-        // Array original
-        const tasks = device.task;
-        
-        // Filtrando o array para excluir o objeto com _id igual a taskId
-        const newTasks = tasks.map((item) => {
-            const id = `${item._id}`
-           
-            if(id !== taskId) {
-                return item
-            } else {
-                return {}
-            }
-        })
+        // Encontrar o índice do objeto dentro do array "task"
+        const indice = device.task.findIndex(objeto => objeto._id.toString() === taskId);
 
-        //Remove objetos vazios
-        function removerObjetosVazios(array) {
-
-            function isObjectVazio(obj) {
-                return Object.keys(obj).length === 0 && obj.constructor === Object;
-            }
-
-            return array.filter(function(elemento) {
-                // Remove apenas objetos vazios {}
-                return !isObjectVazio(elemento);
-            });
+        // Verificar se o objeto foi encontrado no array
+        if (indice === -1) {
+            throw new Error('Objeto não encontrado no array');
         }
-        
-        const newTasksModified = removerObjetosVazios(newTasks)
 
-        device.task = newTasksModified
+        // Remover o objeto do array
+        device.task.splice(indice, 1);
 
-        //AdcionaTask ao Device
-        await Device.findOneAndUpdate(
-            {_id: device._id},
-            { $set: device},
-            { new: true},
-        )
+        // Salvar as mudanças no banco de dados
+        const task = await device.save()
         
-    } catch (err) {
-        console.error(`Erro ao tentar deletar o Task no Device: ${err}`);
-        throw err; // Re-throw the error for handling outside the function
+        if(task) {
+            try {
+                await Task.findByIdAndDelete(taskId)
+            } catch (err) {
+                throw new Error('Erro ao excluir objeto:', err.message )
+            }
+        }
+
+    } catch (error) {
+        throw new Error('Erro ao excluir objeto:', error.message )
     }
 }
+

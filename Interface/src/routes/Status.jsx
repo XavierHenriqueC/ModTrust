@@ -32,7 +32,7 @@ const Status = () => {
   useEffect(() => {
     handleItens()
   }, [modbusData, devices])
- 
+
 
   return (
     <div className="main-center">
@@ -60,9 +60,9 @@ const Status = () => {
                     <td>{item.functionCode}</td>
                     <td>{item.dataType}</td>
                     <td>{item.addresses}</td>
-                    <td>{item.mqttpub ? 'Yes' : 'No'}</td>
+                    <td>{item.mqttpub}</td>
                     <td>{item.variable}</td>
-                    <td>{item.value}</td>
+                    <td style={{width: '12rem', maxWidth: '12rem', minWidth: '12rem'}}>{item.value}</td>
                   </tr>
                 ))}
               </tbody>

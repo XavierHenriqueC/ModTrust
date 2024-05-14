@@ -165,7 +165,7 @@ class DeviceConfigurator {
                                     resp = await this.client.readCoils(Address, elements).catch((err) => reject(err));
                                     
                                     const filterValues = resp.response.body.valuesAsArray;
-                                    console.log(filterValues)
+                                    
                                     values = removerItens(filterValues, elements)
                                 } else {
                                     throw new Error("Leitura: Para o functionCode 1 ou 2, utilize o tipo bool");
@@ -345,8 +345,6 @@ async function scanModbus(connections) {
                 try {
                     if (read) {
                         const values = await Device.readModbus(read.functionCode, read.address, read.elements, read.dataType);
-
-                        console.log(values)
 
                         // console.log(values) debug
                         values.forEach((value, index) => {

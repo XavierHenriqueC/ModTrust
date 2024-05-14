@@ -15,6 +15,7 @@ const AddTask = ({ close, deviceId }) => {
   const [failMessage, setFailMessage] = useState({status: false, message: ''})
 
   const [variablesName, setVariablesName] = useState([])
+  const [tempVariablesName, setTempVariablesName] = useState([])
 
   const addTask = async () => {
     try {
@@ -43,28 +44,56 @@ const AddTask = ({ close, deviceId }) => {
   //Constroi array de variablesName de acordo com a quantidade de elementos e datatype
   const handleVariablesName = () => {
 
-    //Zera array
-    setVariablesName([])
-    
-    //Defini quantidade de variaveis
-    let quantity = 0
-    
-    if (newTask.dataType === "bool" || newTask.dataType === "int16" || newTask.dataType === "uint16") {
-      quantity = newTask.elements
-    } else {
-      quantity = newTask.elements / 2
-    }
+    if (newTask.variablesName) {
+      
+      //Defini quantidade de variaveis
+      let quantity = 0
 
-    //Injeta os objetos no array
-    for (let index = 0; index < quantity; index++) {
-      let obj = {variable: "", mqttpub: false}
-      setVariablesName((prevState) => [...prevState, obj])
-    }
+      if(newTask.functionCode === 1 || newTask.functionCode === 2) {
+        setNewTask({ ...newTask, dataType: 'bool'})
+        quantity = newTask.elements
+      }
+      
+      if (newTask.dataType === "bool" || newTask.dataType === "int16" || newTask.dataType === "uint16") {
+        quantity = newTask.elements
+      } else {
+        quantity = newTask.elements / 2
+      }
 
+      const lastVariablesName = [...tempVariablesName]
+
+      //Injeta os objetos no array
+      if(quantity !== newTask.variablesName.length) {
+        setVariablesName([])
+        
+        let newVariablesName = []
+
+        for (let index = 0; index < quantity; index++) {
+          let obj = {variable: "", mqttpub: false}
+          newVariablesName.push(obj)
+        }
+
+        // Copiar os valores da array de origem para a array de destino
+        const novoArrayDestino = newVariablesName.map((elemento, indice) => {
+          if (indice < lastVariablesName.length) {
+            return lastVariablesName[indice];
+          } else {
+            return { variable: "", mqttpub: false };
+          }
+        });
+        
+        // Atualizar o estado do array de destino
+        setVariablesName(novoArrayDestino);
+
+      } else {
+        setVariablesName(lastVariablesName)
+      }
+    }
   }
 
   //Função para atribuir os valores vindo dos inputs de variablesName para o array de variablesName
   const handleVariablesNameChange = (key, value, index) => {
+    
     const newVariablesName = variablesName.map((variablesName, i) => {
 
       if (i === index) {
@@ -92,6 +121,7 @@ const AddTask = ({ close, deviceId }) => {
       }
 
     });
+    setTempVariablesName(newVariablesName)
     setVariablesName(newVariablesName);
   }
 
@@ -121,7 +151,7 @@ const AddTask = ({ close, deviceId }) => {
   useEffect(() => {
     setFailMessage({status: false, message: ""})
  
-    if(newTask.address < 0 || newTask.address === "" || newTask.address === NaN) {
+    if(newTask.address < 0 || newTask.address === "") {
       setNewTask({ ...newTask, address:0})
     }
 
@@ -207,11 +237,10 @@ const AddTask = ({ close, deviceId }) => {
       </div>
 
       <div className="form-control variables-name">
-        <label>
           <table>
             <thead>
                 <tr>
-                  <th>Addresses</th>
+                  <th style={{width: "6rem"}}>Addresses</th>
                   <th>Name</th>
                   <th>MQTT Publish</th>
                 </tr>
@@ -226,7 +255,6 @@ const AddTask = ({ close, deviceId }) => {
               ))}
             </tbody>
           </table>
-        </label>
       </div>
 
       <div className="form-control">

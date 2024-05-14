@@ -123,7 +123,7 @@ async function getModbusVariables() {
     return new Promise((resolve) => {
         // Espera até que modbusVariables seja atualizado
         const checkAndUpdate = () => {
-            if (Object.keys(modbusVariables).length > 0) {
+            if (Object.keys(modbusVariables)) {
                 resolve({ ...modbusVariables }); // Resolve a promessa com uma cópia do objeto
             } else {
                 setTimeout(checkAndUpdate, 100); // Verifica novamente após 100ms

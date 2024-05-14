@@ -4,27 +4,24 @@ import { deleteTask } from '../../utils/API';
 import '../modal.css'
 import { Context } from '../../../context/Context';
 
-const DeleteTask = ({ close, id }) => {
+const DeleteTask = ({ close, id, refresh }) => {
+
+  const { getInfos } = useContext(Context)
 
   const deleteTasks = async () => {
-
-    const { getInfos } = useContext(Context)
-    
     try {
-
-      const promise = id.map(async(item) => {
-        await deleteTask(item)
-      })
-
-      await Promise.all(promise)
+      for (const item of id) {
+        await deleteTask(item);
+      }
       
-      await getInfos()
-      close(true)
-
+      await getInfos();
+      close(true);
+    
     } catch (error) {
-      console.log(error)
+      console.log(error);
+    } finally {
+      refresh(true)
     }
-
   }
 
   const handleSubmit = () => {

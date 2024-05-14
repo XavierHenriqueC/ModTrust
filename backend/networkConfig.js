@@ -7,11 +7,20 @@ const Network = require('./models/Network');
 
 const systemOS = os.platform()
 
-const ipConfigs = os.networkInterfaces().Ethernet[1]
+//console.log(os.networkInterfaces())
+//console.log(systemOS)
+
+let ipConfigs = ''
+
+//Define informações de IP de acordo com sistema operacional
+if(systemOS === 'win32') {
+  ipConfigs = os.networkInterfaces().Ethernet[1]
+} else if (systemOS === 'linux') {
+  ipConfigs = os.networkInterfaces().eth0[0]
+}
 
 const mac = ipConfigs.mac.replace(/:/g, "")
 
-//console.log(os.networkInterfaces())
 
 // Função para configurar a rede
 function configurarRede(interfaceNameWin, interfaceNameLinux, ip, subnetMask, gateway) {

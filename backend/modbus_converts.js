@@ -1,3 +1,5 @@
+const Big = require('big.js');
+
 //Função para checar se um dado é do tipo float
 function isFloat(number) {
     return Number(number) === number && number % 1 !== 0;
@@ -106,9 +108,8 @@ function uint32ToModbusRegisters(value) {
 
 //LIDA COM VALORES FLOAT32 --------------------------------------------------------------------------------------------------------------
 
-//Transforma 2 registradores em um valor float32
+// Transforma 2 registradores em um valor float32
 function modbusRegistersToFloat32(register1, register2) {
-
     // Combina os dois registradores em um buffer de 4 bytes
     let buffer = Buffer.alloc(4);
     buffer.writeUInt16LE(register1, 0);
@@ -117,9 +118,13 @@ function modbusRegistersToFloat32(register1, register2) {
     // Lê o valor float32 do buffer
     let floatValue = buffer.readFloatLE(0);
 
-    // Retorna o valor float32
-    return Number(floatValue.toFixed(1));
+    // Arredonda o valor float32 para duas casas decimais usando o Big.js
+    let roundedValue = new Big(floatValue).toFixed(2);
+
+    // Retorna o valor float32 arredondado com duas casas decimais
+    return parseFloat(roundedValue);
 }
+
 
 //Transforma um valor float32 em 2 registradores
 function float32ToModbusRegisters(value) {

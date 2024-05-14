@@ -20,8 +20,10 @@ const modalStyles = {
         transform: 'translate(-50%, -50%)',
         backgroundColor: "#fff",
         width: '50%',
-        overflow: "none",
-        minHeight: '50%'
+        overflow: "hidden",
+        height:'80%',
+        minHeight: '80%',
+        maxHeight: '80%'
     },
 };
 
@@ -67,6 +69,7 @@ const Tasks = ({ isOpen, closeModal, id }) => {
     useEffect(() => {
         if (isOpen) {
             getDevice()
+            setSelectedItens([])
         }
     }, [isOpen])
 
@@ -80,7 +83,6 @@ const Tasks = ({ isOpen, closeModal, id }) => {
     }
 
     const handleSelectItem = (state, id) => {
-        console.log(state, id)
         if (state) {
           setSelectedItens([...selectedItens, id])
         } else {
@@ -92,9 +94,9 @@ const Tasks = ({ isOpen, closeModal, id }) => {
         }
     }
 
-    useEffect(() => {
+    const handleRefresh = () => {
         setSelectedItens([])
-    },[closeModal])
+    }
 
     return (
         <Modal
@@ -105,7 +107,7 @@ const Tasks = ({ isOpen, closeModal, id }) => {
             <div className="modal">
                 {modalOpen.add && <AddTask isOpen={modalOpen.add} close={() => handleCloseTaskScreens()} deviceId={id}></AddTask>}
                 {modalOpen.edit && <EditTask isOpen={modalOpen.edit} close={handleCloseTaskScreens} id={editId}></EditTask>}
-                {modalOpen.delete && <DeleteTask isOpen={modalOpen.delete} close={() => handleCloseTaskScreens()} id={selectedItens}></DeleteTask>}
+                {modalOpen.delete && <DeleteTask isOpen={modalOpen.delete} close={() => handleCloseTaskScreens()} refresh = {handleRefresh} id={selectedItens}></DeleteTask>}
                 <div className="title-header">
                     <p>{device.name}</p>
                     <button onClick={handleClose}>X</button>
@@ -114,43 +116,45 @@ const Tasks = ({ isOpen, closeModal, id }) => {
                     <button disabled={selectedItens.length > 0 ? false : true} onClick={() => openModal("delete")}>Delete</button>
                     <button onClick={() => openModal("add")}>Add Task</button>
                 </div>
-                <div className="table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Initial Address</th>
-                                <th>Elements</th>
-                                <th>Function Code</th>
-                                <th>Data Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {device.task && device.task.length > 0 && device.task.map((item, index) => (
-                                <>  
-                                    <tr key={index}>
-                                        <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input type='checkbox' onChange={(e) => handleSelectItem(e.target.checked, item._id)}></input></td>
-                                        <td onDoubleClick={() => handleEditTask(item._id)}>{item.address}</td>
-                                        <td onDoubleClick={() => handleEditTask(item._id)}>{item.elements}</td>
-                                        <td onDoubleClick={() => handleEditTask(item._id)}>{item.functionCode}</td>
-                                        <td onDoubleClick={() => handleEditTask(item._id)}>{item.dataType}</td>
-                                    </tr>
-                                    <tr className='variables-title'>
-                                        <td colSpan={2}>Addresses</td>
-                                        <td colSpan={2}>Variables</td>
-                                        <td>MQTT Publish</td>
-                                    </tr>
-                                    {item.variablesName.map((vars, i) =>(
-                                        <tr className='variables' key={i}>
-                                            <td style={{textAlign:'center'}} colSpan={2}>{item.dataType === "uint16" || item.dataType === "int16" || item.dataType === "bool" ? (item.address + i) : (`${item.address + (i * 2)} - ${item.address + (i * 2) + 1}`)}</td>
-                                            <td colSpan={2} style={{fontSize: '14px'}}>{vars.variable}</td>
-                                            <td style={{textAlign:'center', zIndex:0}}>{vars.mqttpub ? "Yes" : 'No'}</td>
+                <div className="content">
+                    <div className="table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Initial Address</th>
+                                    <th>Elements</th>
+                                    <th>Function Code</th>
+                                    <th>Data Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {device.task && device.task.length > 0 && device.task.map((item, index) => (
+                                    <>  
+                                        <tr key={index}>
+                                            <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><input type='checkbox' onChange={(e) => handleSelectItem(e.target.checked, item._id)}></input></td>
+                                            <td onDoubleClick={() => handleEditTask(item._id)}>{item.address}</td>
+                                            <td onDoubleClick={() => handleEditTask(item._id)}>{item.elements}</td>
+                                            <td onDoubleClick={() => handleEditTask(item._id)}>{item.functionCode}</td>
+                                            <td onDoubleClick={() => handleEditTask(item._id)}>{item.dataType}</td>
                                         </tr>
-                                    ))}
-                                </>
-                            ))}
-                        </tbody>
-                    </table>
+                                        <tr className='variables-title'>
+                                            <td colSpan={2}>Addresses</td>
+                                            <td colSpan={2}>Variables</td>
+                                            <td>MQTT Publish</td>
+                                        </tr>
+                                        {item.variablesName.map((vars, i) =>(
+                                            <tr className='variables' key={vars.variable}>
+                                                <td style={{textAlign:'center'}} colSpan={2}>{item.dataType === "uint16" || item.dataType === "int16" || item.dataType === "bool" ? (item.address + i) : (`${item.address + (i * 2)} - ${item.address + (i * 2) + 1}`)}</td>
+                                                <td colSpan={2} style={{fontSize: '14px'}}>{vars.variable}</td>
+                                                <td style={{textAlign:'center', zIndex:0}}>{vars.mqttpub ? "Yes" : 'No'}</td>
+                                            </tr>
+                                        ))}
+                                    </>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  backend:
+    depends_on:
+      - mongodb
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    volumes:
+      - ./backend:/app
+    ports:
+      - "3000:3000"
+    networks:
+      - datanet
+      
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb:/data/db
+    networks:
+      - datanet
+
+  nginx:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./Interface/dist:/usr/share/nginx/html
+    command: [nginx-debug, '-g', 'daemon off;']
+    depends_on:
+      - frontend-build
+
+  frontend-build:
+    image: node
+    working_dir: /app
+    volumes:
+      - ./Interface:/app
+    command: ["npm", "run", "build"]
+networks:
+  datanet:
+    driver: bridge

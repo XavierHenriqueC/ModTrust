@@ -161,7 +161,7 @@ const EditTask = ({ close, id }) => {
   useEffect(() => {
     setFailMessage({status: false, message: ""})
 
-    if(task.address < 0 || task.address === "" || task.address === NaN) {
+    if(task.address < 0 || task.address === "") {
       setTask({ ...task, address:0})
     }
 
@@ -169,7 +169,7 @@ const EditTask = ({ close, id }) => {
       setTask({ ...task, address:65535})
     }
 
-    if(task.elements < 0 || task.elements === "" || task.elements === NaN) {
+    if(task.elements < 0 || task.elements === "") {
       setTask({ ...task, elements:0})
     }
 

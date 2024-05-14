@@ -12,6 +12,7 @@
   "author": "Henrique Xavier - hxc_henrique@hotmail.com",
   "license": "MIT",
   "dependencies": {
+    "big.js": "^6.2.1",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
