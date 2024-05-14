@@ -4,13 +4,9 @@ services:
   backend:
     depends_on:
       - mongodb
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: xavierhenriquec/modtrust:latest
     container_name: backend
     restart: always
-    volumes:
-      - ./backend:/app
     ports:
       - "3000:3000"
     networks:
