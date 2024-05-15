@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const mongoHost = 'mongodb://mongodb:27017/trustbus'
+const mongoHost = 'mongodb://mongo:27017/trustbus'
 
 async function main () {
     await mongoose.connect(mongoHost);
