@@ -2,5 +2,5 @@
     root * /srv
     encode gzip
     file_server
-    reverse_proxy /api/* host.internal.docker:3000
+    reverse_proxy /api/* backend:3000
 }
