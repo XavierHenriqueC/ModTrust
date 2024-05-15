@@ -13,7 +13,7 @@ services:
     networks:
       - datanet
 
-  mongodb:
+  mongo:
     image: mongo:latest
     container_name: mongo
     restart: always
