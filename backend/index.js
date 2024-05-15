@@ -1,3 +1,6 @@
+const path = require('path');
+const { exec } = require('child_process');
+
 //Import Network Config
 const { configurarRedeUsuario, setDefault } = require('./networkConfig')
 
@@ -48,27 +51,63 @@ app.use('/network', NetworkRoutes)
 app.listen(3000);
 
 async function main () {
-    //Seta valores padrão de Network no DB (se necessário)
-    await setDefault ()
-    
-    //Puxa valores de network no DB
-    const networks = await Network.find()
-    const network = networks[0]
+  //Seta valores padrão de Network no DB (se necessário)
+  await setDefault ()
+  
+  //Puxa valores de network no DB
+  const networks = await Network.find()
+  const network = networks[0]
 
-    //Configura parametros da placa de rede LAN
-    configurarRedeUsuario("Ethernet","eth0", network.mode, network.ip, network.netmask, network.gateway);
+  //Configura parametros da placa de rede LAN
+  configurarRedeUsuario("Ethernet","eth0", network.mode, network.ip, network.netmask, network.gateway);
 
-    //Configura parametros da placa de rede WAN
-    //configurarRedeUsuario("Ethernet 1","eth1", network.modeWan, network.ipWan, network.netmaskWan, network.gatewayWan);
+  //Configura parametros da placa de rede WAN
+  //configurarRedeUsuario("Ethernet 1","eth1", network.modeWan, network.ipWan, network.netmaskWan, network.gatewayWan);
 
-    //Conecta com o Broker MQTT
-    await connectBrokerMqtt()
+  //Conecta com o Broker MQTT
+  await connectBrokerMqtt()
 
-    //Executa Modbus e MQTT
-    modbusMqtt ()
+  //Executa Modbus e MQTT
+  modbusMqtt ()
 }
 
+
+//Servidor FrontEnd
+
+async function frontEndServer () {
+
+  // // Diretório da aplicação React
+  // const appDirectory = path.resolve(__dirname,'..', 'Interface');
+
+  // // Comando de build da aplicação React
+  // const buildCommand = 'npm run build';
+
+  try {
+
+    const buildPath = path.join(__dirname, 'Interface', 'dist');
+
+    // Serve os arquivos estáticos da aplicação React
+    app.use(express.static(buildPath));
+
+    // Rota para servir a aplicação React
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(buildPath, 'index.html'));
+    });
+
+    // Inicia o servidor
+    const PORT = process.env.PORT || 8080;
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
+    });
+
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+
 main()
+frontEndServer()
 
 
 

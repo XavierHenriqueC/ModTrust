@@ -8,10 +8,10 @@ services:
     container_name: backend
     ports:
       - "3000:3000"
+      - "8080:8080"
     restart: always
     networks:
       - datanet
-      - api
 
   mongodb:
     image: mongo:latest
@@ -21,34 +21,6 @@ services:
       - ./mongodb:/data/db
     networks:
       - datanet
-
-  frontend-build:
-    image: node
-    working_dir: /app
-    volumes:
-      - ./Interface:/app
-    command: ["sh", "-c", "npm install && npm run build"]
-    depends_on:
-      - backend
-    networks:
-    - api
-
-  caddy:
-    image: caddy
-    ports:
-      - "8080:8080"
-      - "443:443"  # Porta HTTPS
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./Interface/dist:/srv
-    depends_on:
-      - backend
-      - frontend-build
-    networks:
-      - api
-
 networks:
   datanet:
-    driver: bridge
-  api:
     driver: bridge

@@ -1,4 +1,0 @@
-site example.com {
-    proxy / localhost:8080
-    reverse_proxy localhost:3000
-}
