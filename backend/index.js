@@ -22,11 +22,19 @@ const app = express();
 //Configura express
 app.use(express.json());
 
-//Cors
+// //Cors
+// app.use(cors({
+//     origin:'*',
+//     methods: ["GET", 'PATCH', 'POST', 'DELETE'],
+// }))
+
+// Ou, para permitir apenas requisições do mesmo domínio (por exemplo, localhost)
+// Substitua 'http://localhost:3000' pelo seu domínio local e porta
 app.use(cors({
-    origin:'*',
-    methods: ["GET", 'PATCH', 'POST', 'DELETE'],
-}))
+  origin: 'http://localhost:8080',
+  optionsSuccessStatus: 200 // Algumas versões antigas do CORS não reconhecem este código sem isso
+}));
+
 
 //Public folders
 app.use(express.static('public'));
