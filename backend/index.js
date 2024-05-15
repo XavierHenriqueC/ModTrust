@@ -33,8 +33,7 @@ app.use(express.json());
 
 //Cors
 app.use(cors({
-  origin:'host.docker.internal:8080',
-  methods: ["GET", 'PATCH', 'POST', 'DELETE'],
+  origin:'http://host.docker.internal:8080',
 }))
 
 
