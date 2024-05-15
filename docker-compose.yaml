@@ -3,7 +3,7 @@ version: '3.9'
 services:
   backend:
     depends_on:
-      - mongodb
+      - mongo
     image: xavierhenriquec/modtrust:latest
     container_name: backend
     ports:
@@ -15,7 +15,7 @@ services:
 
   mongodb:
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongo
     restart: always
     volumes:
       - ./mongodb:/data/db
