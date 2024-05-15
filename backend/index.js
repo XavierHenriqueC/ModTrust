@@ -31,10 +31,10 @@ app.use(express.json());
 // Permitir solicitações CORS de qualquer origem
 // app.use(cors());
 
-//Cors
+// Configurando o CORS para permitir solicitações de qualquer origem
 app.use(cors({
-  origin:'http://host.docker.internal:8080',
-}))
+  origin: '*',
+}));
 
 
 //Public folders
