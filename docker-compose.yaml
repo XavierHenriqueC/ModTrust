@@ -19,27 +19,26 @@ services:
     networks:
       - datanet
 
-  nginx:
-  image: nginx
-  ports:
-    - "8080:80"
-  volumes:
-    - ./Interface/dist:/usr/share/nginx/html
-    - ./nginx.api.conf:/etc/nginx/conf.d/api.conf
-    - ./nginx.conf:/etc/nginx/nginx.conf
-  command: [nginx-debug, '-g', 'daemon off;']
-  depends_on:
-    - backend
-  networks:
-    - datanet
-
-
   frontend-build:
     image: node
     working_dir: /app
     volumes:
       - ./Interface:/app
     command: ["sh", "-c", "npm install && npm run build"]
+    depends_on:
+      - backend
+    networks:
+      - datanet
+
+  nginx:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./Interface/dist:/usr/share/nginx/html
+      - ./nginx.api.conf:/etc/nginx/conf.d/api.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    command: [nginx-debug, '-g', 'daemon off;']
     depends_on:
       - backend
     networks:
