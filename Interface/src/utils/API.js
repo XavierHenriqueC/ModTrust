@@ -1,5 +1,5 @@
 //Configurações Gerais
-const urlBase = 'http://localhost:3000';
+const urlBase = 'http://host.internal.docker:3000';
 
 
 const Headers = {
