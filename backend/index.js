@@ -28,12 +28,8 @@ app.use(express.json());
 //     methods: ["GET", 'PATCH', 'POST', 'DELETE'],
 // }))
 
-// Ou, para permitir apenas requisições do mesmo domínio (por exemplo, localhost)
-// Substitua 'http://localhost:3000' pelo seu domínio local e porta
-app.use(cors({
-  credentials: true,
-  origin: 'http://localhost:8080',
-}));
+// Permitir solicitações CORS de qualquer origem
+app.use(cors());
 
 
 //Public folders
