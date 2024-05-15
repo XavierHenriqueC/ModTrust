@@ -30,17 +30,17 @@ services:
     networks:
       - datanet
 
-  nginx:
-    image: nginx
+  caddy:
+    image: caddy
     ports:
-      - "8080:80"
+      - "8080:8080"
+      - "443:443"  # Porta HTTPS
     volumes:
-      - ./Interface/dist:/usr/share/nginx/html
-      - ./nginx.api.conf:/etc/nginx/conf.d/api.conf
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    command: [nginx-debug, '-g', 'daemon off;']
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./Interface/dist:/srv
     depends_on:
       - backend
+      - frontend-build
     networks:
       - datanet
 

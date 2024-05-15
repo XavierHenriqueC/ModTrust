@@ -1,0 +1,6 @@
+:8080 {
+    root * /srv
+    encode gzip
+    file_server
+    reverse_proxy /api/* backend:3000
+}
