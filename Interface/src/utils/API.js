@@ -1,5 +1,5 @@
 //Configurações Gerais
-const urlBase = 'http://127.0.0.1:3000';
+const urlBase = 'http://backend:3000';
 
 
 const Headers = {
