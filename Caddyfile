@@ -1,6 +1,4 @@
-:8080 {
-    root * /srv
-    encode gzip
-    file_server
-    reverse_proxy /api/* backend:3000
+site example.com {
+    proxy / localhost:8080
+    reverse_proxy localhost:3000
 }
