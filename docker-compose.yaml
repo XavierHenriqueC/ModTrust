@@ -1,11 +1,11 @@
 version: '3.9'
 
 services:
-  backend:
+  server:
     depends_on:
       - mongo
     image: xavierhenriquec/modtrust:latest
-    container_name: backend
+    container_name: server
     ports:
       - "3000:3000"
       - "8080:8080"
