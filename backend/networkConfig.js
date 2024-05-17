@@ -19,8 +19,9 @@ if(systemOS === 'win32') {
   ipConfigs = os.networkInterfaces().eth0[0]
 }
 
-const mac = ipConfigs.mac.replace(/:/g, "")
 
+const originalMac = ipConfigs.mac.replace(/:/g, "")
+const mac = originalMac.toUpperCase()
 
 // Função para configurar a rede
 function configurarRede(interfaceNameWin, interfaceNameLinux, ip, subnetMask, gateway) {
@@ -157,8 +158,8 @@ async function setDefault () {
         network.mqttPort = 1883
         network.mqttUsername = ''
         network.mqttPassword = ''
-        network.mqttTopic = `trustbus/${mac}`
-        network.mqttSubscribe = `trustbus/${mac}`
+        network.mqttTopic = `TRUSTBUS/${mac}`
+        network.mqttSubscribe = `TRUSTBUS/${mac}`
         
         network.defaultConfigs = true
         
@@ -201,8 +202,8 @@ async function setDefault () {
         mqttPort : 1883,
         mqttUsername : '',
         mqttPassword : '',
-        mqttTopic : `trustbus/${mac}`,
-        mqttSubscribe : `trustbus/${mac}`,
+        mqttTopic : `TRUSTBUS/${mac}`,
+        mqttSubscribe : `TRUSTBUS/${mac}`,
         
         defaultConfigs : true,
       })
