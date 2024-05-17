@@ -12,7 +12,7 @@ export async function getAllDevices() {
   const url = `${urlBase}/device/getall`;
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "GET",
     headers: Headers,
   };
@@ -42,7 +42,7 @@ export async function getDeviceById (id) {
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "POST",
     headers: Headers,
     body: JSON.stringify(body),
@@ -79,7 +79,7 @@ export async function registerNewDevice(type, name, ip, port, unitId, timeout, b
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "POST",
     headers: Headers,
     body: JSON.stringify(body),
@@ -117,7 +117,7 @@ export async function editDeviceById(id, type, name, ip, port, unitId, timeout, 
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "PATCH",
     headers: Headers,
     body: JSON.stringify(body),
@@ -148,7 +148,7 @@ export async function deleteDevice (id) {
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "DELETE",
     headers: Headers,
     body: JSON.stringify(body),
@@ -176,7 +176,7 @@ export async function getAllTasks () {
   const url = `${urlBase}/task/getall`;
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "GET",
     headers: Headers,
   };
@@ -206,7 +206,7 @@ export async function getTaskById (id) {
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "POST",
     headers: Headers,
     body: JSON.stringify(body),
@@ -244,7 +244,7 @@ export async function registerNewTask (deviceId, functionType, functionCode, add
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "POST",
     headers: Headers,
     body: JSON.stringify(body),
@@ -282,7 +282,7 @@ export async function editTaskById (id, functionType, functionCode, address, ele
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "PATCH",
     headers: Headers,
     body: JSON.stringify(body),
@@ -313,7 +313,7 @@ export async function deleteTask (id) {
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "DELETE",
     headers: Headers,
     body: JSON.stringify(body),
@@ -341,7 +341,7 @@ export async function getAllModbusData() {
   const url = `${urlBase}/modbusdata/getall`;
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "GET",
     headers: Headers,
   };
@@ -369,7 +369,7 @@ export async function getAllNetworks() {
   const url = `${urlBase}/network/getall`;
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "GET",
     headers: Headers,
   };
@@ -429,7 +429,7 @@ export async function editNetworkById(id, mode, ip, netmask, gateway, modeWan, i
   }
 
   const options = {
-    mode: 'cors',
+    //mode: 'cors',
     method: "PATCH",
     headers: Headers,
     body: JSON.stringify(body),
