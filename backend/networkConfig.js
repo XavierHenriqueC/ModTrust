@@ -7,7 +7,7 @@ const Network = require('./models/Network');
 
 const systemOS = os.platform()
 
-//console.log(os.networkInterfaces())
+console.log(os.networkInterfaces())
 //console.log(systemOS)
 
 let ipConfigs = ''
