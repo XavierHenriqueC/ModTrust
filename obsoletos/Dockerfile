@@ -1,5 +1,5 @@
 # Imagem Base para Node.js
-FROM arm64v8/node:14 AS node_builder
+FROM node AS node_builder
 
 # Diretório de trabalho para o projeto Node.js
 WORKDIR /app/backend
@@ -14,7 +14,7 @@ RUN npm install
 COPY backend/ .
 
 # Imagem Base para o projeto React
-FROM arm64v8/node:14 AS react_builder
+FROM node AS react_builder
 
 # Diretório de trabalho para o projeto React
 WORKDIR /app/Interface
@@ -32,7 +32,7 @@ COPY Interface/ .
 RUN npm run build
 
 # Combina as duas imagens
-FROM arm64v8/node:14
+FROM node
 
 # Diretório de trabalho no container
 WORKDIR /app
