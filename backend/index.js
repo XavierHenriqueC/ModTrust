@@ -22,20 +22,13 @@ const app = express();
 //Configura express
 app.use(express.json());
 
-// //Cors
-// app.use(cors({
-//     origin:'*',
-//     methods: ["GET", 'PATCH', 'POST', 'DELETE'],
-// }))
-
-// Permitir solicitações CORS de qualquer origem
-// app.use(cors());
-
-// Configurando o CORS para permitir solicitações de qualquer origem
-app.use(cors({
-  origin: '*',
-}));
-
+// Middleware para desabilitar o CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 //Public folders
 app.use(express.static('public'));
@@ -68,7 +61,7 @@ async function main () {
   const network = networks[0]
 
   //Configura parametros da placa de rede LAN
-  configurarRedeUsuario("Ethernet","eth0", network.mode, network.ip, network.netmask, network.gateway);
+  configurarRedeUsuario("Ethernet","wlan0", network.mode, network.ip, network.netmask, network.gateway);
 
   //Configura parametros da placa de rede WAN
   //configurarRedeUsuario("Ethernet 1","eth1", network.modeWan, network.ipWan, network.netmaskWan, network.gatewayWan);

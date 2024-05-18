@@ -16,7 +16,7 @@ let ipConfigs = ''
 if(systemOS === 'win32') {
   ipConfigs = os.networkInterfaces().Ethernet[1]
 } else if (systemOS === 'linux') {
-  ipConfigs = os.networkInterfaces().eth0[0]
+  ipConfigs = os.networkInterfaces().wlan0[0]
 }
 
 
