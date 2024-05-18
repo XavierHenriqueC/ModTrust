@@ -5,6 +5,7 @@ services:
     depends_on:
       - mongo
     image: xavierhenriquec/modtrust:latest
+    privileged: true
     platform: linux/arm64/v8
     container_name: server
     ports:
@@ -17,6 +18,7 @@ services:
   mongo:
     image: mongodb-raspberrypi4-unofficial-r7.0.4:latest
     container_name: mongo
+    privileged: true
     restart: always
     volumes:
       - ./mongodb:/data/db

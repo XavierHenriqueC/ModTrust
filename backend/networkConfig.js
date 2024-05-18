@@ -133,7 +133,7 @@ async function setDefault () {
         //Create
         //Seta valores padrão de fabrica
         network.mode = 'static'
-        network.ip = '192.168.0.2'
+        network.ip = '192.168.0.10'
         network.netmask = '255.255.255.0'
         network.gateway = '192.168.0.1'
         network.mac = mac
@@ -177,7 +177,7 @@ async function setDefault () {
       const network = new Network ({
         //Seta valores padrão de fabrica
         mode : 'static',
-        ip : '192.168.0.1',
+        ip : '192.168.0.10',
         netmask : '255.255.255.0',
         gateway : '192.168.0.1',
         mac : mac,
