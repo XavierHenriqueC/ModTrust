@@ -15,8 +15,7 @@ services:
       - datanet
 
   mongo:
-    image: arm64v8/mongo:4.4.18
-    platform: linux/arm64/v8
+    image: mongodb-raspberrypi4-unofficial-r7.0.4:latest
     container_name: mongo
     restart: always
     volumes:
