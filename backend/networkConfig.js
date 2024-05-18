@@ -133,9 +133,9 @@ async function setDefault () {
         //Create
         //Seta valores padrão de fabrica
         network.mode = 'static'
-        network.ip = '192.168.2.10'
+        network.ip = '192.168.0.2'
         network.netmask = '255.255.255.0'
-        network.gateway = '192.168.2.1'
+        network.gateway = '192.168.0.1'
         network.mac = mac
         
         network.modeWan = 'dhcp'
@@ -177,9 +177,9 @@ async function setDefault () {
       const network = new Network ({
         //Seta valores padrão de fabrica
         mode : 'static',
-        ip : '192.168.2.10',
+        ip : '192.168.0.1',
         netmask : '255.255.255.0',
-        gateway : '192.168.2.1',
+        gateway : '192.168.0.1',
         mac : mac,
 
         modeWan: 'dhcp',
