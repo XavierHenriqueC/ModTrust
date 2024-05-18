@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.1'
 
 services:
   server:
@@ -15,7 +15,7 @@ services:
       - datanet
 
   mongo:
-    image: arm64v8/mongo:4.2
+    image: arm64v8/mongo
     platform: linux/arm64/v8
     container_name: mongo
     restart: always
