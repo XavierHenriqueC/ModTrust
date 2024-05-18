@@ -15,7 +15,7 @@ services:
       - datanet
 
   mongo:
-    image: arm64v8/mongo:4.4
+    image: arm64v8/mongo:latest
     platform: linux/arm64/v8
     container_name: mongo
     restart: always
