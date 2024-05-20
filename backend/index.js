@@ -24,7 +24,7 @@ app.use(express.json());
 
 // Configuração do CORS
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: '*',
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   credentials: true
 }));
