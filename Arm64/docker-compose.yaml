@@ -1,12 +1,13 @@
-version: '3.9'
+version: '3.8'
 
 services:
   server:
     depends_on:
       - mongo
     image: xavierhenriquec/modtrust:latest
-    container_name: server
     privileged: true
+    platform: linux/arm64/v8
+    container_name: server
     ports:
       - "3000:3000"
       - "8080:8080"
@@ -15,8 +16,10 @@ services:
       - datanet
 
   mongo:
-    image: mongo:latest
+    image: arm64v8/mongo:latest
+    platform: linux/arm64/v8
     container_name: mongo
+    privileged: true
     restart: always
     volumes:
       - ./mongodb:/data/db
