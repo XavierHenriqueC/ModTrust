@@ -1,10 +1,12 @@
-version: '3.9'
+version: '3.8'
 
 services:
   server:
     depends_on:
       - mongo
     image: xavierhenriquec/modtrust:latest
+    privileged: true
+    platform: linux/arm64/v8
     container_name: server
     ports:
       - "3000:3000"
@@ -14,8 +16,9 @@ services:
       - datanet
 
   mongo:
-    image: mongo:latest
+    image: mongodb-raspberrypi4-unofficial-r7.0.4:latest
     container_name: mongo
+    privileged: true
     restart: always
     volumes:
       - ./mongodb:/data/db
