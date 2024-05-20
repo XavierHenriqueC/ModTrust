@@ -1,5 +1,19 @@
+// src/config.js
+const getBackendUrl = () => {
+  const { protocol, hostname } = window.location;
+  const port = 3000; // Porta do backend Express
+
+  if (hostname === 'localhost') {
+    // Durante o desenvolvimento
+    return `http://localhost:${port}`;
+  } else {
+    // Produção ou acesso remoto
+    return `${protocol}//${hostname}:${port}`;
+  }
+};
+
 //Configurações Gerais
-const urlBase = 'http://3.130.230.108:3000';
+const urlBase = getBackendUrl();
 
 
 const Headers = {
