@@ -23,6 +23,8 @@ if(systemOS === 'win32') {
 const originalMac = ipConfigs.mac.replace(/:/g, "")
 const mac = originalMac.toUpperCase()
 
+console.log(mac)
+
 // Função para configurar a rede
 function configurarRede(interfaceNameWin, interfaceNameLinux, ip, subnetMask, gateway) {
 
@@ -35,8 +37,8 @@ function configurarRede(interfaceNameWin, interfaceNameLinux, ip, subnetMask, ga
 
   // Comando para configurar a rede no Linux
   else if (systemOS === "linux") {
-    comando = `sudo ifconfig ${interfaceNameLinux} ${ip} netmask ${subnetMask}`;
-    comandoGateway = `sudo route add default gw ${gateway}`;
+    comando = `ifconfig ${interfaceNameLinux} ${ip} netmask ${subnetMask}`;
+    comandoGateway = `route add default gw ${gateway}`;
   } else {
     return
   }
@@ -82,7 +84,7 @@ async function configurarDHCP(interfaceNameWin, interfaceNameLinux) {
     comando = `netsh interface ip set address "${interfaceNameWin}" dhcp`;
   } else if (systemOS === "linux") {
     // Comando para configurar o DHCP no Linux
-    comando = `sudo dhclient -r ${interfaceNameLinux} && sudo dhclient ${interfaceNameLinux}`;
+    comando = `dhclient -r ${interfaceNameLinux} && dhclient ${interfaceNameLinux}`;
   }
 
   //Verifica se DHCP já está habilitado (Windows)

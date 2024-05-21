@@ -43,6 +43,9 @@ COPY --from=node_builder /app/backend .
 # Copia os arquivos de construção do projeto React da imagem do projeto React
 COPY --from=react_builder /app/Interface/dist ./Interface/dist
 
+# Atualize o repositório de pacotes e instale o net-tools
+RUN apt-get update && apt-get install -y net-tools iproute2
+
 # Expõe as portas
 EXPOSE 3000
 EXPOSE 8080

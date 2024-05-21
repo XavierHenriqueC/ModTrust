@@ -60,7 +60,7 @@ async function main () {
   const network = networks[0]
 
   //Configura parametros da placa de rede LAN
-  configurarRedeUsuario("Ethernet","wlan0", network.mode, network.ip, network.netmask, network.gateway);
+  configurarRedeUsuario("Ethernet","eth0", network.mode, network.ip, network.netmask, network.gateway);
 
   //Configura parametros da placa de rede WAN
   //configurarRedeUsuario("Ethernet 1","eth1", network.modeWan, network.ipWan, network.netmaskWan, network.gatewayWan);
@@ -76,12 +76,6 @@ async function main () {
 //Servidor FrontEnd
 
 async function frontEndServer () {
-
-  // // Diretório da aplicação React
-  // const appDirectory = path.resolve(__dirname,'..', 'Interface');
-
-  // // Comando de build da aplicação React
-  // const buildCommand = 'npm run build';
 
   try {
 
@@ -105,7 +99,6 @@ async function frontEndServer () {
     console.log(err)
   }
 }
-
 
 main()
 frontEndServer()
